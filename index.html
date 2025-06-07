@@ -72,6 +72,13 @@
             width: 250px;
             margin-bottom: 20px;
         }
+        .calculator, .quiz {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+        }
         @media (max-width: 600px) {
             .info-links, .content {
                 display: block;
@@ -93,7 +100,7 @@
         <div class="info-links">
             <h3>Maklumat Berkaitan:</h3>
             <a href="https://www.arduino.cc/en/software/" class="btn" target="_blank">Mai kita install Arduino</a>
-            <a href="https://login.arduino.cc/login?state=hKFo2SBtVl9iVkJWRkZvbnJKdHp2MUZZdXhYS0s5UDVzNDRRaqFupWxvZ2luo3RpZNkgZGJFM0ZKVjc5UUpKNVhCTmVMdmNrVlBYQlY2V0JsQjSjY2lk2SBlOXFpcEEyTjBrOVA4dnZyZTlmZEdjNnU5S2w5ZUhTUA&client=e9qipA2N0k9P8vvre9fdGc6u9Kl9eHSP&protocol=oauth2&scope=openid+profile+email&redirect_uri=https%3A%2F%2Fapp.arduino.cc&response_type=code&response_mode=query&nonce=VVlLbDNtRWRZeTlpSzRBejFkWmNIYjdJc3Nqb3J3SkJUZTJjVWFIRFpPVA%3D%3D&code_challenge=qC9hH-XhyB8R0ev4Po7Q_pkKTiKArA5FZB92k9zl6DQ&code_challenge_method=S256&auth0Client=eyJuYW1lIjoiYXV0aDAtc3BhLWpzIiwidmVyc2lvbiI6IjIuMS4zIn0%3D#/sso/login" class="btn" target="_blank">Kalau takut Devices berat tekan sini</a>
+            <a href="https://www.arduino.cc/en/software/" class="btn" target="_blank">Kalau takut Devices berat tekan sini</a>
         </div>
 
         <div class="content">
@@ -101,7 +108,50 @@
         </div>
     </div>
 
+    <div class="calculator">
+        <h3>Kalkulator Arduino: Kira Nilai Resistor</h3>
+        <label for="voltage">Masukkan Voltan (V):</label>
+        <input type="number" id="voltage" placeholder="Voltan dalam V">
+        
+        <label for="current">Masukkan Arus (A):</label>
+        <input type="number" id="current" placeholder="Arus dalam A">
+        
+        <button class="btn" onclick="calculateResistance()">Kira Nilai Resistor</button>
+        <p id="result"></p>
+    </div>
+
+    <div class="quiz">
+        <h3>Quiz Arduino: Uji Pengetahuan Anda</h3>
+        <p>Apakah fungsi utama mikropengawal dalam Arduino?</p>
+        <button class="btn" onclick="checkAnswer('A')">A) Menyalakan LED secara manual</button>
+        <button class="btn" onclick="checkAnswer('B')">B) Mengawal komponen elektronik secara automatik</button>
+        <button class="btn" onclick="checkAnswer('C')">C) Hanya menyimpan kod tanpa eksekusi</button>
+        <p id="quiz-result"></p>
+    </div>
+
     <p>Jika ada sebarang pertanyaan, sila hubungi saya di <strong>adamtijjani009@gmail.com</strong></p>
+
+    <script>
+        function calculateResistance() {
+            let voltage = document.getElementById("voltage").value;
+            let current = document.getElementById("current").value;
+
+            if (voltage && current) {
+                let resistance = voltage / current;
+                document.getElementById("result").innerHTML = `Nilai Resistor: ${resistance.toFixed(2)} Ohm`;
+            } else {
+                document.getElementById("result").innerHTML = "Sila masukkan kedua-dua nilai.";
+            }
+        }
+
+        function checkAnswer(answer) {
+            if (answer === "B") {
+                document.getElementById("quiz-result").innerHTML = "✅ Betul! Mikropengawal mengawal komponen elektronik secara automatik.";
+            } else {
+                document.getElementById("quiz-result").innerHTML = "❌ Salah! Cuba lagi.";
+            }
+        }
+    </script>
 
 </body>
 </html>
