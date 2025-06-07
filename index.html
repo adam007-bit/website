@@ -11,10 +11,15 @@
             text-align: center;
             background-color: #f4f4f4;
             padding: 20px;
-            position: relative;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: justify;
         }
         h1 {
             color: #0073e6;
+            text-align: center;
         }
         p {
             font-size: 18px;
@@ -22,31 +27,52 @@
         }
         .info-links {
             text-align: left;
-            position: absolute;
-            left: 20px;
-            top: 50px;
+            width: 250px;
+            padding: 10px;
+            margin-left: 20px;
+            border-left: 3px solid #0073e6;
+            display: inline-block;
+            vertical-align: top;
+        }
+        .content {
+            display: inline-block;
+            width: calc(100% - 300px);
         }
         img {
             width: 250px;
             margin-bottom: 20px;
+        }
+        @media (max-width: 600px) {
+            .info-links, .content {
+                display: block;
+                width: 100%;
+                text-align: center;
+                margin-left: 0;
+                border-left: none;
+            }
         }
     </style>
 </head>
 <body>
 
     <h1>Arduino Power: Pelajar Sekolah Menjadi Teknorat</h1>
-    <p class="content">Arduino merupakan platform terbuka yang membolehkan pelajar memahami asas elektronik dan pengaturcaraan dengan mudah. Projek-projek asas seperti LED blinking dan sensor pengesan suhu membantu pelajar mengembangkan kemahiran teknikal mereka.</p>
+    
+    <div class="container">
+        <div class="info-links">
+            <h3>Maklumat Berkaitan:</h3>
+            <ul>
+                <li><a href="https://www.arduino.cc/" target="_blank">Arduino Official Site</a></li>
+                <li><a href="https://create.arduino.cc/" target="_blank">Arduino Create Platform</a></li>
+                <li><a href="https://www.instructables.com/howto/arduino/" target="_blank">Arduino Projek di Instructables</a></li>
+            </ul>
+        </div>
 
-    <div class="info-links">
-        <h3>Maklumat Berkaitan:</h3>
-        <ul>
-            <li><a href="https://www.arduino.cc/" target="_blank">Arduino Official Site</a></li>
-            <li><a href="https://create.arduino.cc/" target="_blank">Arduino Create Platform</a></li>
-            <li><a href="https://www.instructables.com/howto/arduino/" target="_blank">Arduino Projek di Instructables</a></li>
-        </ul>
+        <div class="content">
+            <p>Arduino merupakan platform terbuka yang membolehkan pelajar memahami asas elektronik dan pengaturcaraan dengan mudah. Projek-projek asas seperti LED blinking dan sensor pengesan suhu membantu pelajar mengembangkan kemahiran teknikal mereka.</p>
+        </div>
     </div>
 
-  
+    <h2>Hubungi Saya</h2>
     <p>Jika ada sebarang pertanyaan, sila hubungi saya di <strong>adamtijjani009@gmail.com</strong></p>
 
 </body>
