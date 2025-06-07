@@ -17,40 +17,12 @@
             margin: 0 auto;
             text-align: justify;
         }
-        .title {
-            font-family: 'Courier New', monospace;
-            font-size: 22px;
-            color: black;
-            display: block;
-            text-align: left;
-            margin-left: 20px;
-        }
-        .middle-text {
-            font-family: 'Times New Roman', serif;
-            font-size: 18px;
-            color: #707070;
-            text-align: center;
-            max-width: 700px;
-            margin: 20px auto;
-            opacity: 0;
-            animation: fadeIn 2s ease-in forwards;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        .info-links {
-            text-align: left;
-            width: 250px;
-            padding: 10px;
-            margin-left: 20px;
-            border-left: 3px solid #0073e6;
-            display: inline-block;
-            vertical-align: top;
-        }
-        .content {
-            display: inline-block;
-            width: calc(100% - 300px);
+        .quiz-container {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
         }
         .btn {
             display: block;
@@ -60,96 +32,79 @@
             text-decoration: none;
             font-size: 18px;
             border-radius: 5px;
-            margin: 10px 0;
+            margin: 10px auto;
             text-align: center;
+            width: 80%;
             transition: all 0.3s ease;
         }
         .btn:hover {
             background-color: #ff6600;
             transform: scale(1.1);
         }
-        img {
-            width: 250px;
-            margin-bottom: 20px;
-        }
-        .calculator, .quiz {
-            margin-top: 30px;
-            padding: 20px;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
-        }
-        @media (max-width: 600px) {
-            .info-links, .content {
-                display: block;
-                width: 100%;
-                text-align: center;
-                margin-left: 0;
-                border-left: none;
-            }
-        }
     </style>
 </head>
 <body>
 
-    <code class="title">PERNAH TERFIKIR TAK, MACAM MANA LAMPU LIP LAP RAYA BERFUNGSI TANPA SILAP</code>
-    
-    <p class="middle-text">Lampu lip lap berfungsi dengan bantuan mikropengawal yang mengawal nyalaan LED secara sistematik.</p>
-
-    <div class="container">
-        <div class="info-links">
-            <h3>Maklumat Berkaitan:</h3>
-            <a href="https://www.arduino.cc/en/software/" class="btn" target="_blank">Mai kita install Arduino</a>
-            <a href="https://www.arduino.cc/en/software/" class="btn" target="_blank">Kalau takut Devices berat tekan sini</a>
-        </div>
-
-        <div class="content">
-            <p>Arduino merupakan platform terbuka yang membolehkan pelajar memahami asas elektronik dan pengaturcaraan dengan mudah. Projek-projek asas seperti LED blinking dan sensor pengesan suhu membantu pelajar mengembangkan kemahiran teknikal mereka.</p>
-        </div>
-    </div>
-
-    <div class="calculator">
-        <h3>Kalkulator Arduino: Kira Nilai Resistor</h3>
-        <label for="voltage">Masukkan Voltan (V):</label>
-        <input type="number" id="voltage" placeholder="Voltan dalam V">
-        
-        <label for="current">Masukkan Arus (A):</label>
-        <input type="number" id="current" placeholder="Arus dalam A">
-        
-        <button class="btn" onclick="calculateResistance()">Kira Nilai Resistor</button>
-        <p id="result"></p>
-    </div>
-
-    <div class="quiz">
-        <h3>Quiz Arduino: Uji Pengetahuan Anda</h3>
-        <p>Apakah fungsi utama mikropengawal dalam Arduino?</p>
-        <button class="btn" onclick="checkAnswer('A')">A) Menyalakan LED secara manual</button>
-        <button class="btn" onclick="checkAnswer('B')">B) Mengawal komponen elektronik secara automatik</button>
-        <button class="btn" onclick="checkAnswer('C')">C) Hanya menyimpan kod tanpa eksekusi</button>
+    <h2>Arduino Quiz: Pilih Kategori</h2>
+    <div class="quiz-container">
+        <h3>Pilih kategori untuk diuji:</h3>
+        <button class="btn" onclick="startQuiz('arduino')">📟 Arduino Basics</button>
+        <button class="btn" onclick="startQuiz('circuit')">⚡ Circuit Design</button>
+        <button class="btn" onclick="startQuiz('programming')">💻 Arduino Programming</button>
+        <p id="question"></p>
+        <div id="quiz-options"></div>
         <p id="quiz-result"></p>
     </div>
 
-    <p>Jika ada sebarang pertanyaan, sila hubungi saya di <strong>adamtijjani009@gmail.com</strong></p>
-
     <script>
-        function calculateResistance() {
-            let voltage = document.getElementById("voltage").value;
-            let current = document.getElementById("current").value;
+        const quizzes = {
+            arduino: [
+                { question: "Apakah fungsi utama mikropengawal dalam Arduino?", options: ["Menyalakan LED secara manual", "Mengawal komponen elektronik secara automatik", "Hanya menyimpan kod tanpa eksekusi"], answer: "Mengawal komponen elektronik secara automatik" },
+                { question: "Pin digital pada papan Arduino digunakan untuk?", options: ["Membaca sensor analog", "Mengawal input dan output digital", "Menghubungkan ke WiFi"], answer: "Mengawal input dan output digital" }
+            ],
+            circuit: [
+                { question: "Apakah hukum yang digunakan untuk mengira nilai resistor?", options: ["Hukum Ohm", "Hukum Faraday", "Hukum Kirchoff"], answer: "Hukum Ohm" },
+                { question: "Komponen mana yang menyimpan cas elektrik?", options: ["Resistor", "Kapasitor", "Induktor"], answer: "Kapasitor" }
+            ],
+            programming: [
+                { question: "Loop yang digunakan dalam kod Arduino untuk eksekusi berulang?", options: ["if-else", "for", "void setup"], answer: "for" },
+                { question: "Fungsi apa yang wajib ada dalam setiap kod Arduino?", options: ["void loop()", "void restart()", "void checkInput()"], answer: "void loop()" }
+            ]
+        };
 
-            if (voltage && current) {
-                let resistance = voltage / current;
-                document.getElementById("result").innerHTML = `Nilai Resistor: ${resistance.toFixed(2)} Ohm`;
+        let currentQuiz = [];
+        let currentQuestionIndex = 0;
+
+        function startQuiz(category) {
+            currentQuiz = quizzes[category];
+            currentQuestionIndex = 0;
+            showQuestion();
+        }
+
+        function showQuestion() {
+            if (currentQuestionIndex < currentQuiz.length) {
+                let q = currentQuiz[currentQuestionIndex];
+                document.getElementById("question").innerHTML = q.question;
+                let optionsHTML = "";
+                q.options.forEach(option => {
+                    optionsHTML += `<button class="btn" onclick="checkAnswer('${option}')">${option}</button>`;
+                });
+                document.getElementById("quiz-options").innerHTML = optionsHTML;
+                document.getElementById("quiz-result").innerHTML = "";
             } else {
-                document.getElementById("result").innerHTML = "Sila masukkan kedua-dua nilai.";
+                document.getElementById("quiz-result").innerHTML = "✅ Anda telah selesai menjawab semua soalan!";
             }
         }
 
-        function checkAnswer(answer) {
-            if (answer === "B") {
-                document.getElementById("quiz-result").innerHTML = "✅ Betul! Mikropengawal mengawal komponen elektronik secara automatik.";
+        function checkAnswer(selectedAnswer) {
+            let correctAnswer = currentQuiz[currentQuestionIndex].answer;
+            if (selectedAnswer === correctAnswer) {
+                document.getElementById("quiz-result").innerHTML = "✅ Betul!";
             } else {
                 document.getElementById("quiz-result").innerHTML = "❌ Salah! Cuba lagi.";
             }
+            currentQuestionIndex++;
+            setTimeout(showQuestion, 1500);
         }
     </script>
 
