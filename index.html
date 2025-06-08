@@ -6,10 +6,9 @@
     <title>ARDUINO: DARI PELAJAR SEKOLAH MENJADI TEKNORAT TERBILANG</title>
     <meta name="description" content="Panduan mudah untuk pelajar memahami projek Arduino asas.">
     
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
-
+    <!-- Firebase SDK (No import statements needed) -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -94,20 +93,19 @@
     </div>
 
     <script>
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_PROJECT_ID.appspot.com",
-            messagingSenderId: "YOUR_SENDER_ID",
-            appId: "YOUR_APP_ID",
-        };
+        // Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyD02BBBqbetJ2MV6tl2WBysXyIWXKGB7xI",
+  authDomain: "arduino-registrations.firebaseapp.com",
+  projectId: "arduino-registrations",
+  storageBucket: "arduino-registrations.firebasestorage.app",
+  messagingSenderId: "628252066469",
+  appId: "1:628252066469:web:8c1a0dd33d71c9fa6c834c"
+};
 
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+        
         document.getElementById("arduinoForm").addEventListener("submit", function(event) {
             event.preventDefault();
             
