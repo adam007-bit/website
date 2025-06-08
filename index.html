@@ -1,23 +1,154 @@
-<div class="form-container">
-    <h3>Daftar Minat Arduino</h3>
-    <form id="arduinoForm">
-        <label for="name">Nama:</label>
-        <input type="text" id="name" name="name" placeholder="Masukkan nama anda" required>
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARDUINO: DARI PELAJAR SEKOLAH MENJADI TEKNORAT TERBILANG</title>
+    <meta name="description" content="Panduan mudah untuk pelajar memahami projek Arduino asas.">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: justify;
+        }
+        .quiz-container, .form-container {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+        }
+        .btn {
+            display: block;
+            background-color: #0073e6;
+            color: white;
+            padding: 12px 20px;
+            text-decoration: none;
+            font-size: 18px;
+            border-radius: 5px;
+            margin: 10px auto;
+            text-align: center;
+            width: 80%;
+            transition: all 0.3s ease;
+        }
+        .btn:hover {
+            background-color: #ff6600;
+            transform: scale(1.1);
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
 
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" placeholder="Masukkan email anda" required>
+    <h2>Daftar Minat Arduino</h2>
+    <div class="form-container">
+        <h3>Isi maklumat anda:</h3>
+        <form id="arduinoForm">
+            <label for="name">Nama:</label>
+            <input type="text" id="name" name="name" placeholder="Masukkan nama anda" required>
 
-        <label for="age">Umur:</label>
-        <input type="number" id="age" name="age" placeholder="Masukkan umur anda" required>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" placeholder="Masukkan email anda" required>
 
-        <label for="project">Projek Arduino Pilihan:</label>
-        <select id="project" name="project" required>
-            <option value="LED Blinking">LED Blinking</option>
-            <option value="Sensor Suhu">Sensor Suhu</option>
-            <option value="Motor Servo">Motor Servo</option>
-        </select>
+            <label for="age">Umur:</label>
+            <input type="number" id="age" name="age" placeholder="Masukkan umur anda" required>
 
-        <button type="submit" class="btn">Hantar</button>
-        <p id="formResult"></p>
-    </form>
-</div>
+            <label for="project">Projek Arduino Pilihan:</label>
+            <select id="project" name="project" required>
+                <option value="LED Blinking">LED Blinking</option>
+                <option value="Sensor Suhu">Sensor Suhu</option>
+                <option value="Motor Servo">Motor Servo</option>
+            </select>
+
+            <button type="submit" class="btn">Hantar</button>
+            <p id="formResult"></p>
+        </form>
+    </div>
+
+    <h2>Arduino Quiz: Pilih Kategori</h2>
+    <div class="quiz-container">
+        <h3>Pilih kategori untuk diuji:</h3>
+        <button class="btn" onclick="startQuiz('arduino')">📟 Arduino Basics</button>
+        <button class="btn" onclick="startQuiz('circuit')">⚡ Circuit Design</button>
+        <button class="btn" onclick="startQuiz('programming')">💻 Arduino Programming</button>
+        <p id="question"></p>
+        <div id="quiz-options"></div>
+        <p id="quiz-result"></p>
+    </div>
+
+    <script>
+        document.getElementById("arduinoForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            let name = document.getElementById("name").value;
+            let email = document.getElementById("email").value;
+            let age = document.getElementById("age").value;
+            let project = document.getElementById("project").value;
+
+            document.getElementById("formResult").innerHTML = `✅ Terima kasih, ${name}! Kami akan hubungi anda melalui ${email} untuk projek ${project}.`;
+        });
+
+        const quizzes = {
+            arduino: [
+                { question: "Apakah fungsi utama mikropengawal dalam Arduino?", options: ["Menyalakan LED secara manual", "Mengawal komponen elektronik secara automatik", "Hanya menyimpan kod tanpa eksekusi"], answer: "Mengawal komponen elektronik secara automatik" },
+                { question: "Pin digital pada papan Arduino digunakan untuk?", options: ["Membaca sensor analog", "Mengawal input dan output digital", "Menghubungkan ke WiFi"], answer: "Mengawal input dan output digital" }
+            ],
+            circuit: [
+                { question: "Apakah hukum yang digunakan untuk mengira nilai resistor?", options: ["Hukum Ohm", "Hukum Faraday", "Hukum Kirchoff"], answer: "Hukum Ohm" },
+                { question: "Komponen mana yang menyimpan cas elektrik?", options: ["Resistor", "Kapasitor", "Induktor"], answer: "Kapasitor" }
+            ],
+            programming: [
+                { question: "Loop yang digunakan dalam kod Arduino untuk eksekusi berulang?", options: ["if-else", "for", "void setup"], answer: "for" },
+                { question: "Fungsi apa yang wajib ada dalam setiap kod Arduino?", options: ["void loop()", "void restart()", "void checkInput()"], answer: "void loop()" }
+            ]
+        };
+
+        let currentQuiz = [];
+        let currentQuestionIndex = 0;
+
+        function startQuiz(category) {
+            currentQuiz = quizzes[category];
+            currentQuestionIndex = 0;
+            showQuestion();
+        }
+
+        function showQuestion() {
+            if (currentQuestionIndex < currentQuiz.length) {
+                let q = currentQuiz[currentQuestionIndex];
+                document.getElementById("question").innerHTML = q.question;
+                let optionsHTML = "";
+                q.options.forEach(option => {
+                    optionsHTML += `<button class="btn" onclick="checkAnswer('${option}')">${option}</button>`;
+                });
+                document.getElementById("quiz-options").innerHTML = optionsHTML;
+                document.getElementById("quiz-result").innerHTML = "";
+            } else {
+                document.getElementById("quiz-result").innerHTML = "✅ Anda telah selesai menjawab semua soalan!";
+            }
+        }
+
+        function checkAnswer(selectedAnswer) {
+            let correctAnswer = currentQuiz[currentQuestionIndex].answer;
+            if (selectedAnswer === correctAnswer) {
+                document.getElementById("quiz-result").innerHTML = "✅ Betul!";
+            } else {
+                document.getElementById("quiz-result").innerHTML = "❌ Salah! Cuba lagi.";
+            }
+            currentQuestionIndex++;
+            setTimeout(showQuestion, 1500);
+        }
+    </script>
+
+</body>
+</html>
