@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<html l<!DOCTYPE html>
 <html lang="ms">
 <head>
     <meta charset="UTF-8">
@@ -7,7 +6,7 @@
     <title>ARDUINO: DARI PELAJAR SEKOLAH MENJADI TEKNORAT TERBILANG</title>
     <meta name="description" content="Panduan mudah untuk pelajar memahami projek Arduino asas.">
     
-    <!-- Load Firebase SDK from CDN -->
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
 
@@ -47,6 +46,17 @@
         </form>
     </div>
 
+    <h2>Arduino Quiz: Pilih Kategori</h2>
+    <div class="quiz-container">
+        <h3>Pilih kategori untuk diuji:</h3>
+        <button class="btn" onclick="startQuiz('arduino')">📟 Arduino Basics</button>
+        <button class="btn" onclick="startQuiz('circuit')">⚡ Circuit Design</button>
+        <button class="btn" onclick="startQuiz('programming')">💻 Arduino Programming</button>
+        <p id="question"></p>
+        <div id="quiz-options"></div>
+        <p id="quiz-result"></p>
+    </div>
+
     <script>
         // Initialize Firebase
         const firebaseConfig = {
@@ -83,6 +93,52 @@
                 console.error("❌ Error adding document: ", error);
             });
         });
+
+        const quizzes = {
+            arduino: [
+                { question: "Apakah fungsi utama mikropengawal dalam Arduino?", options: ["Menyalakan LED secara manual", "Mengawal komponen elektronik secara automatik", "Hanya menyimpan kod tanpa eksekusi"], answer: "Mengawal komponen elektronik secara automatik" },
+                { question: "Pin digital pada papan Arduino digunakan untuk?", options: ["Membaca sensor analog", "Mengawal input dan output digital", "Menghubungkan ke WiFi"], answer: "Mengawal input dan output digital" }
+            ],
+            circuit: [
+                { question: "Apakah hukum yang digunakan untuk mengira nilai resistor?", options: ["Hukum Ohm", "Hukum Faraday", "Hukum Kirchoff"], answer: "Hukum Ohm" },
+                { question: "Komponen mana yang menyimpan cas elektrik?", options: ["Resistor", "Kapasitor", "Induktor"], answer: "Kapasitor" }
+            ],
+            programming: [
+                { question: "Loop yang digunakan dalam kod Arduino untuk eksekusi berulang?", options: ["if-else", "for", "void setup"], answer: "for" },
+                { question: "Fungsi apa yang wajib ada dalam setiap kod Arduino?", options: ["void loop()", "void restart()", "void checkInput()"], answer: "void loop()" }
+            ]
+        };
+
+        let currentQuiz = [];
+        let currentQuestionIndex = 0;
+
+        function startQuiz(category) {
+            currentQuiz = quizzes[category];
+            currentQuestionIndex = 0;
+            showQuestion();
+        }
+
+        function showQuestion() {
+            if (currentQuestionIndex < currentQuiz.length) {
+                let q = currentQuiz[currentQuestionIndex];
+                document.getElementById("question").innerHTML = q.question;
+                let optionsHTML = "";
+                q.options.forEach(option => {
+                    optionsHTML += `<button class="btn" onclick="checkAnswer('${option}')">${option}</button>`;
+                });
+                document.getElementById("quiz-options").innerHTML = optionsHTML;
+                document.getElementById("quiz-result").innerHTML = "";
+            } else {
+                document.getElementById("quiz-result").innerHTML = "✅ Anda telah selesai menjawab semua soalan!";
+            }
+        }
+
+        function checkAnswer(selectedAnswer) {
+            let correctAnswer = currentQuiz[currentQuestionIndex].answer;
+            document.getElementById("quiz-result").innerHTML = selectedAnswer === correctAnswer ? "✅ Betul!" : "❌ Salah! Cuba lagi.";
+            currentQuestionIndex++;
+            setTimeout(showQuestion, 1500);
+        }
     </script>
 
 </body>
