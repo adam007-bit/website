@@ -1,64 +1,9 @@
-<!DOCTYPE html>
-<html lang="ms">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ARDUINO: DARI PELAJAR SEKOLAH MENJADI TEKNORAT TERBILANG</title>
-    <meta name="description" content="Panduan mudah untuk pelajar memahami projek Arduino asas.">
-    
-   <!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+<!-- Firebase SDK (compat version for older syntax) -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; background-color: #f4f4f4; padding: 20px; }
-        .container { max-width: 800px; margin: 0 auto; text-align: justify; }
-        .quiz-container, .form-container { margin-top: 30px; padding: 20px; background-color: white; border-radius: 10px; box-shadow: 2px 2px 10px rgba(0,0,0,0.1); }
-        .btn { display: block; background-color: #0073e6; color: white; padding: 12px 20px; text-decoration: none; font-size: 18px; border-radius: 5px; margin: 10px auto; text-align: center; width: 80%; transition: all 0.3s ease; }
-        .btn:hover { background-color: #ff6600; transform: scale(1.1); }
-        input, select { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px; }
-    </style>
-</head>
-<body>
-
-    <h2>Daftar Minat Arduino</h2>
-    <div class="form-container">
-        <h3>Isi maklumat anda:</h3>
-        <form id="arduinoForm">
-            <label for="name">Nama:</label>
-            <input type="text" id="name" name="name" placeholder="Masukkan nama anda" required>
-
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" placeholder="Masukkan email anda" required>
-
-            <label for="age">Umur:</label>
-            <input type="number" id="age" name="age" placeholder="Masukkan umur anda" required>
-
-            <label for="project">Projek Arduino Pilihan:</label>
-            <select id="project" name="project" required>
-                <option value="LED Blinking">LED Blinking</option>
-                <option value="Sensor Suhu">Sensor Suhu</option>
-                <option value="Motor Servo">Motor Servo</option>
-            </select>
-
-            <button type="submit" class="btn">Hantar</button>
-            <p id="formResult"></p>
-        </form>
-    </div>
-
-    <h2>Arduino Quiz: Pilih Kategori</h2>
-    <div class="quiz-container">
-        <h3>Pilih kategori untuk diuji:</h3>
-        <button class="btn" onclick="startQuiz('arduino')">📟 Arduino Basics</button>
-        <button class="btn" onclick="startQuiz('circuit')">⚡ Circuit Design</button>
-        <button class="btn" onclick="startQuiz('programming')">💻 Arduino Programming</button>
-        <p id="question"></p>
-        <div id="quiz-options"></div>
-        <p id="quiz-result"></p>
-    </div>
-
-   <script>
-  // Load Firebase SDKs correctly
+<script>
+  // Firebase config
   const firebaseConfig = {
     apiKey: "AIzaSyD02BBBqbetJ2MV6tl2WBysXyIWXKGB7xI",
     authDomain: "arduino-registrations.firebaseapp.com",
@@ -68,79 +13,115 @@
     appId: "1:628252066469:web:8c1a0dd33d71c9fa6c834c"
   };
 
-  // Initialize Firebase (Fixing the error)
+  // Initialize Firebase
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
 
-        document.getElementById("arduinoForm").addEventListener("submit", function(event) {
-            event.preventDefault();
-            
-            let name = document.getElementById("name").value;
-            let email = document.getElementById("email").value;
-            let age = document.getElementById("age").value;
-            let project = document.getElementById("project").value;
+  // === Moved to top ===
+  const quizzes = {
+    arduino: [
+      {
+        question: "Apakah fungsi utama mikropengawal dalam Arduino?",
+        options: [
+          "Menyalakan LED secara manual",
+          "Mengawal komponen elektronik secara automatik",
+          "Hanya menyimpan kod tanpa eksekusi"
+        ],
+        answer: "Mengawal komponen elektronik secara automatik"
+      },
+      {
+        question: "Pin digital pada papan Arduino digunakan untuk?",
+        options: [
+          "Membaca sensor analog",
+          "Mengawal input dan output digital",
+          "Menghubungkan ke WiFi"
+        ],
+        answer: "Mengawal input dan output digital"
+      }
+    ],
+    circuit: [
+      {
+        question: "Apakah hukum yang digunakan untuk mengira nilai resistor?",
+        options: ["Hukum Ohm", "Hukum Faraday", "Hukum Kirchoff"],
+        answer: "Hukum Ohm"
+      },
+      {
+        question: "Komponen mana yang menyimpan cas elektrik?",
+        options: ["Resistor", "Kapasitor", "Induktor"],
+        answer: "Kapasitor"
+      }
+    ],
+    programming: [
+      {
+        question: "Loop yang digunakan dalam kod Arduino untuk eksekusi berulang?",
+        options: ["if-else", "for", "void setup"],
+        answer: "for"
+      },
+      {
+        question: "Fungsi apa yang wajib ada dalam setiap kod Arduino?",
+        options: ["void loop()", "void restart()", "void checkInput()"],
+        answer: "void loop()"
+      }
+    ]
+  };
 
-            db.collection("arduino_registrations").add({
-                name: name,
-                email: email,
-                age: age,
-                project: project,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            })
-            .then(() => {
-                document.getElementById("formResult").innerHTML = `✅ Terima kasih, ${name}! Data telah disimpan dalam Firebase.`;
-            })
-            .catch((error) => {
-                console.error("❌ Error adding document: ", error);
-            });
-        });
+  // === Form Submission ===
+  document.getElementById("arduinoForm").addEventListener("submit", function(event) {
+    event.preventDefault();
 
-        const quizzes = {
-            arduino: [
-                { question: "Apakah fungsi utama mikropengawal dalam Arduino?", options: ["Menyalakan LED secara manual", "Mengawal komponen elektronik secara automatik", "Hanya menyimpan kod tanpa eksekusi"], answer: "Mengawal komponen elektronik secara automatik" },
-                { question: "Pin digital pada papan Arduino digunakan untuk?", options: ["Membaca sensor analog", "Mengawal input dan output digital", "Menghubungkan ke WiFi"], answer: "Mengawal input dan output digital" }
-            ],
-            circuit: [
-                { question: "Apakah hukum yang digunakan untuk mengira nilai resistor?", options: ["Hukum Ohm", "Hukum Faraday", "Hukum Kirchoff"], answer: "Hukum Ohm" },
-                { question: "Komponen mana yang menyimpan cas elektrik?", options: ["Resistor", "Kapasitor", "Induktor"], answer: "Kapasitor" }
-            ],
-            programming: [
-                { question: "Loop yang digunakan dalam kod Arduino untuk eksekusi berulang?", options: ["if-else", "for", "void setup"], answer: "for" },
-                { question: "Fungsi apa yang wajib ada dalam setiap kod Arduino?", options: ["void loop()", "void restart()", "void checkInput()"], answer: "void loop()" }
-            ]
-        };
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const age = document.getElementById("age").value;
+    const project = document.getElementById("project").value;
 
-        let currentQuiz = [];
-        let currentQuestionIndex = 0;
+    db.collection("arduino_registrations").add({
+      name: name,
+      email: email,
+      age: age,
+      project: project,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    })
+    .then(() => {
+      document.getElementById("formResult").innerHTML = `✅ Terima kasih, ${name}! Data telah disimpan dalam Firebase.`;
+    })
+    .catch((error) => {
+      console.error("❌ Error adding document: ", error);
+    });
+  });
 
-        function startQuiz(category) {
-            currentQuiz = quizzes[category];
-            currentQuestionIndex = 0;
-            showQuestion();
-        }
+  // === Quiz Logic ===
+  let currentQuiz = [];
+  let currentQuestionIndex = 0;
 
-        function showQuestion() {
-            if (currentQuestionIndex < currentQuiz.length) {
-                let q = currentQuiz[currentQuestionIndex];
-                document.getElementById("question").innerHTML = q.question;
-                let optionsHTML = "";
-                q.options.forEach(option => {
-                    optionsHTML += `<button class="btn" onclick="checkAnswer('${option}')">${option}</button>`;
-                });
-                document.getElementById("quiz-options").innerHTML = optionsHTML;
-                document.getElementById("quiz-result").innerHTML = "";
-            } else {
-                document.getElementById("quiz-result").innerHTML = "✅ Anda telah selesai menjawab semua soalan!";
-            }
-        }
+  function startQuiz(category) {
+    currentQuiz = quizzes[category];
+    currentQuestionIndex = 0;
+    showQuestion();
+  }
 
-        function checkAnswer(selectedAnswer) {
-            let correctAnswer = currentQuiz[currentQuestionIndex].answer;
-            document.getElementById("quiz-result").innerHTML = selectedAnswer === correctAnswer ? "✅ Betul!" : "❌ Salah! Cuba lagi.";
-            currentQuestionIndex++;
-            setTimeout(showQuestion, 1500);
-        }
-    </script>
+  function showQuestion() {
+    if (currentQuestionIndex < currentQuiz.length) {
+      const q = currentQuiz[currentQuestionIndex];
+      document.getElementById("question").innerHTML = q.question;
 
-</body>
-</html>
+      let optionsHTML = "";
+      q.options.forEach(option => {
+        optionsHTML += `<button class="btn" onclick="checkAnswer('${option}')">${option}</button>`;
+      });
+
+      document.getElementById("quiz-options").innerHTML = optionsHTML;
+      document.getElementById("quiz-result").innerHTML = "";
+    } else {
+      document.getElementById("quiz-result").innerHTML = "✅ Anda telah selesai menjawab semua soalan!";
+    }
+  }
+
+  function checkAnswer(selectedAnswer) {
+    const correctAnswer = currentQuiz[currentQuestionIndex].answer;
+    document.getElementById("quiz-result").innerHTML =
+      selectedAnswer === correctAnswer ? "✅ Betul!" : "❌ Salah! Cuba lagi.";
+    currentQuestionIndex++;
+    setTimeout(showQuestion, 1500);
+  }
+</script>
+
