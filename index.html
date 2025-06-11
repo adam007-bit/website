@@ -30,18 +30,49 @@
       font-weight: bold;
       font-size: 2em;
     }
-    .btn {
+
+    /* Soft edges and smooth animation for buttons and inputs */
+    .btn, input[type="text"], input[type="email"], input[type="number"], textarea {
       padding: 10px 15px;
+      border-radius: 12px;
+      border: 1px solid #ccc;
+      margin-top: 10px;
+      background-color: #f8f9fa;
+      font-size: 1em;
+      transition: all 0.3s ease;
+    }
+
+    /* Button hover effect */
+    .btn:hover, input[type="text"]:hover, input[type="email"]:hover, input[type="number"]:hover, textarea:hover {
+      border-color: #007bff;
+      box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+      background-color: #f1f8ff;
+    }
+
+    /* Focus effect */
+    input:focus, textarea:focus {
+      border-color: #007bff;
+      outline: none;
+      background-color: #f1f8ff;
+    }
+
+    /* Submit button animation */
+    .btn {
       background: #007bff;
       color: white;
-      border: none;
-      border-radius: 4px;
       cursor: pointer;
-      margin-top: 10px;
     }
     .btn:hover {
       background: #0056b3;
+      transform: scale(1.05);
     }
+
+    /* Input and textarea hover effect */
+    input[type="text"], input[type="email"], input[type="number"], textarea {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+
     .training-services a {
       text-decoration: none;
       color: #007bff;
