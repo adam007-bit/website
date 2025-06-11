@@ -13,6 +13,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      animation: fadeIn 1s ease-out;
     }
     .container {
       width: 80%;
@@ -24,55 +25,27 @@
       box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
       text-align: center;
       margin-bottom: 20px;
+      animation: slideInUp 0.8s ease-out;
     }
     h1 {
       font-family: 'Courier New', monospace;
       font-weight: bold;
       font-size: 2em;
     }
-
-    /* Soft edges and smooth animation for buttons and inputs */
-    .btn, input[type="text"], input[type="email"], input[type="number"], textarea {
-      padding: 10px 15px;
-      border-radius: 12px;
-      border: 1px solid #ccc;
-      margin-top: 10px;
-      background-color: #f8f9fa;
-      font-size: 1em;
-      transition: all 0.3s ease;
-    }
-
-    /* Button hover effect */
-    .btn:hover, input[type="text"]:hover, input[type="email"]:hover, input[type="number"]:hover, textarea:hover {
-      border-color: #007bff;
-      box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
-      background-color: #f1f8ff;
-    }
-
-    /* Focus effect */
-    input:focus, textarea:focus {
-      border-color: #007bff;
-      outline: none;
-      background-color: #f1f8ff;
-    }
-
-    /* Submit button animation */
     .btn {
+      padding: 10px 15px;
       background: #007bff;
       color: white;
+      border: none;
+      border-radius: 15px;
       cursor: pointer;
+      margin-top: 10px;
+      transition: background 0.3s ease, transform 0.2s;
     }
     .btn:hover {
       background: #0056b3;
       transform: scale(1.05);
     }
-
-    /* Input and textarea hover effect */
-    input[type="text"], input[type="email"], input[type="number"], textarea {
-      width: 100%;
-      margin-bottom: 10px;
-    }
-
     .training-services a {
       text-decoration: none;
       color: #007bff;
@@ -81,6 +54,76 @@
     }
     .training-services a:hover {
       color: #0056b3;
+    }
+    .option {
+      margin: 10px 0;
+      background: #28a745;
+      border-radius: 12px;
+      font-size: 1.1em;
+      padding: 12px;
+      transition: background 0.3s ease, transform 0.2s, box-shadow 0.2s ease;
+    }
+    .option:hover {
+      background: #218838;
+      transform: scale(1.05);
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Animation Definitions */
+    @keyframes fadeIn {
+      0% {
+        opacity: 0;
+      }
+      100% {
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideInUp {
+      0% {
+        transform: translateY(50px);
+        opacity: 0;
+      }
+      100% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes bounce {
+      0% {
+        transform: translateY(0);
+      }
+      25% {
+        transform: translateY(-5px);
+      }
+      50% {
+        transform: translateY(0);
+      }
+      75% {
+        transform: translateY(-5px);
+      }
+      100% {
+        transform: translateY(0);
+      }
+    }
+
+    /* Result message animations */
+    .result-message {
+      animation: fadeIn 1s ease-out;
+      padding: 15px;
+      margin-top: 20px;
+      border-radius: 10px;
+    }
+
+    .result-success {
+      background-color: #d4edda;
+      color: #155724;
+    }
+
+    .result-error {
+      background-color: #f8d7da;
+      color: #721c24;
     }
   </style>
 </head>
@@ -184,15 +227,6 @@
           timestamp: firebase.firestore.FieldValue.serverTimestamp()
         })
         .then(() => {
-          document.getElementById("formResult").innerHTML = `✅ Terima kasih, ${name}! Data telah disimpan dalam Firebase.`;
-          document.getElementById("arduinoForm").reset();
-        })
-        .catch(error => {
-          console.error("❌ Error adding document: ", error);
-          document.getElementById("formResult").innerHTML = "❌ Ralat menyimpan data. Sila cuba lagi.";
-        });
-      });
-    });
-  </script>
-</body>
-</html>
+          const formResult = document.getElementById("formResult");
+          formResult.innerHTML = `<div class="result-message result-success">✅ Terima kasih, ${name}! Data telah disimpan dalam Firebase.</div>`;
+          formResult.classList.add
