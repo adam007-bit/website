@@ -10,13 +10,17 @@
       padding: 30px;
       background: #f0f4f8;
       color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
     h1, p.intro {
       font-family: 'Courier New', monospace;
       font-weight: bold;
     }
-    .form-group {
-      margin-bottom: 15px;
+    .form-group, .section {
+      margin-bottom: 20px;
+      width: 80%;
     }
     .btn {
       margin: 5px;
@@ -37,8 +41,17 @@
       border-radius: 4px;
       border: 1px solid #ccc;
     }
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+      text-align: center;
+    }
     #mainContent {
       display: none;
+      width: 100%;
     }
   </style>
 </head>
@@ -78,9 +91,43 @@
 
 <!-- ✅ MAIN CONTENT -->
 <div id="mainContent">
-  <h1>Arduino: Pelajar Sekolah Menjadi Teknorat Terbilang</h1>
-  <p class="intro">Selamat datang ke portal pembelajaran Arduino! Anda kini log masuk.</p>
-  <button class="btn" onclick="logout()">Log Keluar</button>
+  <div class="card">
+    <h1>CABARAN INOVASI</h1>
+    <button class="btn" onclick="logout()">Log Keluar</button>
+  </div>
+
+  <div class="card">
+    <h3>Tentang Kami</h3>
+    <p>Kami bersemangat terhadap teknologi dan pendidikan, menyediakan pengalaman pembelajaran melalui projek Arduino & latihan kejuruteraan perisian.</p>
+    <p>Misi kami adalah untuk menghubungkan inovasi dengan pembelajaran, membina penyelesaian kreatif dan praktikal.</p>
+  </div>
+
+  <div class="card">
+    <h3>Latihan Projek</h3>
+    <p>ARDUINO CONTROLLED CAR | ARDUINO WORKSHOP | PROJEK SEKOLAH | SOFTWARE ENGINEERING</p>
+  </div>
+
+  <div class="card">
+    <h2>📋 Pendaftaran Arduino</h2>
+    <form id="arduinoForm">
+      <input type="text" id="name" placeholder="Nama" required><br>
+      <input type="email" id="email" placeholder="Email" required><br>
+      <input type="number" id="age" placeholder="Umur" required><br>
+      <textarea id="project" placeholder="Nyatakan projek anda" required></textarea><br>
+      <button type="submit" class="btn">Hantar</button>
+    </form>
+    <div id="formResult"></div>
+  </div>
+
+  <div class="card">
+    <h2>🎯 Kuiz Arduino & Elektronik</h2>
+    <button class="btn" onclick="startQuiz('arduino')">Kuiz Arduino</button>
+    <button class="btn" onclick="startQuiz('circuit')">Kuiz Litar</button>
+    <button class="btn" onclick="startQuiz('programming')">Kuiz Pengaturcaraan</button>
+    <div id="question" style="margin-top:20px;"></div>
+    <div id="quiz-options"></div>
+    <div id="quiz-result"></div>
+  </div>
 </div>
 
 <!-- ✅ Firebase SDKs -->
@@ -89,7 +136,6 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
 <script>
-  // Firebase Config
   const firebaseConfig = {
     apiKey: "AIzaSyD02BBBqbetJ2MV6tl2WBysXyIWXKGB7xI",
     authDomain: "arduino-registrations.firebaseapp.com",
@@ -99,12 +145,10 @@
     appId: "1:628252066469:web:8c1a0dd33d71c9fa6c834c"
   };
 
-  // Init Firebase
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
   const db = firebase.firestore();
 
-  // Register function
   function register() {
     const name = document.getElementById("registerName").value;
     const age = document.getElementById("registerAge").value;
@@ -118,24 +162,21 @@
     }
 
     auth.createUserWithEmailAndPassword(email, password)
-      .then((userCredential) => {
+      .then(userCredential => {
         const uid = userCredential.user.uid;
         return db.collection("users").doc(uid).set({
-          name: name,
-          age: age,
-          email: email,
+          name, age, email,
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
       })
       .then(() => {
-        document.getElementById("authMessage").innerText = "✅ Pendaftaran berjaya! Sila log masuk.";
+        document.getElementById("authMessage").innerText = "✅ Pendaftaran berjaya!";
       })
-      .catch((error) => {
+      .catch(error => {
         document.getElementById("authMessage").innerText = "❌ " + error.message;
       });
   }
 
-  // Login function
   function login() {
     const email = document.getElementById("loginEmail").value;
     const password = document.getElementById("loginPassword").value;
@@ -145,12 +186,11 @@
         document.getElementById("authSection").style.display = "none";
         document.getElementById("mainContent").style.display = "block";
       })
-      .catch((error) => {
+      .catch(error => {
         document.getElementById("authMessage").innerText = "❌ " + error.message;
       });
   }
 
-  // Logout
   function logout() {
     auth.signOut().then(() => {
       document.getElementById("authSection").style.display = "block";
@@ -158,8 +198,7 @@
     });
   }
 
-  // Auto login check
-  auth.onAuthStateChanged((user) => {
+  auth.onAuthStateChanged(user => {
     if (user) {
       document.getElementById("authSection").style.display = "none";
       document.getElementById("mainContent").style.display = "block";
@@ -168,6 +207,75 @@
       document.getElementById("mainContent").style.display = "none";
     }
   });
+
+  document.getElementById("arduinoForm").addEventListener("submit", function(event) {
+    event.preventDefault();
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const age = document.getElementById("age").value;
+    const project = document.getElementById("project").value;
+
+    db.collection("arduino_registrations").add({
+      name, email, age, project,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    })
+    .then(() => {
+      document.getElementById("formResult").innerText = `✅ Terima kasih, ${name}!`;
+      document.getElementById("arduinoForm").reset();
+    })
+    .catch((error) => {
+      document.getElementById("formResult").innerText = "❌ Ralat menyimpan data.";
+    });
+  });
+
+  const quizzes = {
+    arduino: [
+      { question: "Apakah itu Arduino?", options: ["Robot", "Platform mikropengawal", "Sensor"], answer: "Platform mikropengawal" },
+      { question: "Bahasa apakah digunakan dalam Arduino IDE?", options: ["Python", "C++", "Java"], answer: "C++" }
+    ],
+    circuit: [
+      { question: "Apakah komponen utama untuk menyimpan cas?", options: ["Perintang", "Kapasitor", "LED"], answer: "Kapasitor" },
+      { question: "Apakah simbol bagi arus terus (DC)?", options: ["~", "-", "="], answer: "=" }
+    ],
+    programming: [
+      { question: "Apa itu 'loop()' dalam Arduino?", options: ["Fungsi utama", "Sensor", "Pin digital"], answer: "Fungsi utama" },
+      { question: "Kod manakah betul untuk hidupkan LED?", options: ["digitalWrite(13, HIGH);", "led.on();", "turnOn(LED);"], answer: "digitalWrite(13, HIGH);" }
+    ]
+  };
+
+  let currentQuiz = [];
+  let currentQuestionIndex = 0;
+
+  function startQuiz(category) {
+    currentQuiz = quizzes[category];
+    currentQuestionIndex = 0;
+    showQuestion();
+  }
+
+  function showQuestion() {
+    if (currentQuestionIndex < currentQuiz.length) {
+      const q = currentQuiz[currentQuestionIndex];
+      document.getElementById("question").innerText = q.question;
+      document.getElementById("quiz-options").innerHTML = q.options.map(option =>
+        `<button class="btn" onclick="checkAnswer('${option}')">${option}</button>`).join('');
+      document.getElementById("quiz-result").innerText = "";
+    } else {
+      document.getElementById("quiz-result").innerText = "✅ Anda telah tamat kuiz!";
+      document.getElementById("question").innerText = "";
+      document.getElementById("quiz-options").innerHTML = "";
+    }
+  }
+
+  function checkAnswer(selectedAnswer) {
+    const correctAnswer = currentQuiz[currentQuestionIndex].answer;
+    document.getElementById("quiz-result").innerText =
+      selectedAnswer === correctAnswer ? "✅ Betul!" : "❌ Salah! Jawapan betul: " + correctAnswer;
+    currentQuestionIndex++;
+    setTimeout(showQuestion, 1500);
+  }
+
+  window.startQuiz = startQuiz;
+  window.checkAnswer = checkAnswer;
 </script>
 
 </body>
