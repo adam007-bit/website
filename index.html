@@ -155,9 +155,10 @@
     const email = document.getElementById("registerEmail").value;
     const password = document.getElementById("registerPassword").value;
     const confirmPassword = document.getElementById("confirmPassword").value;
+    const message = document.getElementById("authMessage");
 
     if (password !== confirmPassword) {
-      document.getElementById("authMessage").innerText = "❌ Kata laluan tidak sepadan.";
+      message.innerText = "❌ Kata laluan tidak sepadan.";
       return;
     }
 
@@ -167,13 +168,13 @@
         return db.collection("users").doc(uid).set({
           name, age, email,
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        }).then(() => {
+          message.innerHTML = `✅ Terima kasih ${name}, pendaftaran anda berjaya!<br>📧 Email: ${email}<br>🎂 Umur: ${age}`;
+          console.log(`👤 Pengguna baru didaftar:\nNama: ${name}\nUmur: ${age}\nEmail: ${email}`);
         });
       })
-      .then(() => {
-        document.getElementById("authMessage").innerText = "✅ Pendaftaran berjaya!";
-      })
       .catch(error => {
-        document.getElementById("authMessage").innerText = "❌ " + error.message;
+        message.innerText = "❌ " + error.message;
       });
   }
 
@@ -280,3 +281,4 @@
 
 </body>
 </html>
+
