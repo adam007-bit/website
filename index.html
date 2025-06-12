@@ -3,230 +3,172 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Portal Pembelajaran Arduino</title>
+  <title>Arduino Learning Portal</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       padding: 30px;
       background: #f0f4f8;
       color: #333;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      animation: fadeIn 1s ease-out;
     }
-    .container {
-      width: 80%;
-    }
-    .header, .about-section, .training-services, .whatsapp-button {
-      background: white;
-      padding: 15px;
-      border-radius: 15px;
-      box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-      text-align: center;
-      margin-bottom: 20px;
-      animation: slideInUp 0.8s ease-out;
-    }
-    h1 {
+    h1, p.intro {
       font-family: 'Courier New', monospace;
       font-weight: bold;
-      font-size: 2em;
+    }
+    .form-group {
+      margin-bottom: 15px;
     }
     .btn {
+      margin: 5px;
       padding: 10px 15px;
       background: #007bff;
       color: white;
       border: none;
-      border-radius: 15px;
+      border-radius: 4px;
       cursor: pointer;
-      margin-top: 10px;
-      transition: background 0.3s ease, transform 0.2s;
     }
     .btn:hover {
       background: #0056b3;
-      transform: scale(1.05);
     }
-    .training-services a {
-      text-decoration: none;
-      color: #007bff;
-      font-weight: bold;
-      margin: 0 5px;
+    input, textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
     }
-    .training-services a:hover {
-      color: #0056b3;
-    }
-    .option {
-      margin: 10px 0;
-      background: #28a745;
-      border-radius: 12px;
-      font-size: 1.1em;
-      padding: 12px;
-      transition: background 0.3s ease, transform 0.2s, box-shadow 0.2s ease;
-    }
-    .option:hover {
-      background: #218838;
-      transform: scale(1.05);
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-    }
-
-    /* Animation Definitions */
-    @keyframes fadeIn {
-      0% {
-        opacity: 0;
-      }
-      100% {
-        opacity: 1;
-      }
-    }
-
-    @keyframes slideInUp {
-      0% {
-        transform: translateY(50px);
-        opacity: 0;
-      }
-      100% {
-        transform: translateY(0);
-        opacity: 1;
-      }
-    }
-
-    @keyframes bounce {
-      0% {
-        transform: translateY(0);
-      }
-      25% {
-        transform: translateY(-5px);
-      }
-      50% {
-        transform: translateY(0);
-      }
-      75% {
-        transform: translateY(-5px);
-      }
-      100% {
-        transform: translateY(0);
-      }
-    }
-
-    /* Result message animations */
-    .result-message {
-      animation: fadeIn 1s ease-out;
-      padding: 15px;
-      margin-top: 20px;
-      border-radius: 10px;
-    }
-
-    .result-success {
-      background-color: #d4edda;
-      color: #155724;
-    }
-
-    .result-error {
-      background-color: #f8d7da;
-      color: #721c24;
+    #mainContent {
+      display: none;
     }
   </style>
 </head>
 <body>
-  <div class="container">
 
-    <!-- ✅ Header -->
-    <div class="header">
-      <h1>CABARAN INOVASI</h1>
-    </div>
-
-    <!-- ✅ Tentang Kami -->
-    <div class="about-section">
-      <h3>Tentang Kami</h3>
-      <p>Kami berdedikasi dalam teknologi dan pendidikan, menawarkan pengalaman pembelajaran secara maya melalui projek Arduino dan latihan kejuruteraan perisian.</p>
-      <p>Misi kami adalah untuk merapatkan jurang antara inovasi dan pembelajaran, serta memberi peluang kepada individu untuk membina penyelesaian yang kreatif dan praktikal.</p>
-    </div>
-
-    <!-- ✅ Training Services (Clickable) -->
-    <div class="training-services">
-      <h3>Perkhidmatan Latihan</h3>
-      <p>
-        <a href="arduino-car.html">KERETA KAWALAN ARDUINO</a> |
-        <a href="arduino-drone.html">DRON KAWALAN ARDUINO</a> |
-        <a href="arduino-school-projects.html">PROJEK ARDUINO UNTUK SEKOLAH</a> |
-        <a href="software-engineering.html">KEJURUTERAAN PERISIAN</a>
-      </p>
-    </div>
-
-    <!-- ✅ WhatsApp Button -->
-    <a href="whatsapp-link.html">
-      <div class="whatsapp-button">
-        <h3>WhatsApp</h3>
-      </div>
-    </a>
-
-    <hr />
-
-    <!-- ✅ Arduino Portal Introduction -->
-    <h1>Arduino: Pelajar Sekolah Menjadi Teknorat Terbilang</h1>
-    <p class="intro">
-      Selamat datang ke portal pembelajaran Arduino! Di sini anda boleh mendaftar projek anda serta menguji pengetahuan melalui kuiz elektronik. Jom mulakan!
-    </p>
-
-    <!-- ✅ Registration Form -->
-    <h2>📋 Pendaftaran Arduino</h2>
-    <form id="arduinoForm">
-      <label>Nama:</label><br />
-      <input type="text" id="name" required /><br />
-      <label>Email:</label><br />
-      <input type="email" id="email" required /><br />
-      <label>Umur:</label><br />
-      <input type="number" id="age" required /><br />
-      <label>Projek:</label><br />
-      <textarea id="project" required></textarea><br />
-      <button type="submit" class="btn">Hantar</button>
-    </form>
-    <div id="formResult"></div>
-
-    <hr />
-
-    <!-- ✅ Quiz Section -->
-    <h2>🎯 Kuiz Arduino & Elektronik</h2>
-    <button class="btn" onclick="startQuiz('arduino')">Kuiz Arduino</button>
-    <button class="btn" onclick="startQuiz('circuit')">Kuiz Litar</button>
-    <button class="btn" onclick="startQuiz('programming')">Kuiz Pengaturcaraan</button>
-
-    <div id="question" style="margin-top:20px;"></div>
-    <div id="quiz-options"></div>
-    <div id="quiz-result"></div>
-
+<!-- 🔐 LOGIN & REGISTER SECTION -->
+<div id="authSection">
+  <h2>🔐 Log Masuk</h2>
+  <div class="form-group">
+    <input type="email" id="loginEmail" placeholder="Email" required />
   </div>
+  <div class="form-group">
+    <input type="password" id="loginPassword" placeholder="Kata Laluan" required />
+  </div>
+  <button class="btn" onclick="login()">Log Masuk</button>
 
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-  
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const firebaseConfig = {
-        apiKey: "AIzaSyD02BBBqbetJ2MV6tl2WBysXyIWXKGB7xI",
-        authDomain: "arduino-registrations.firebaseapp.com",
-        projectId: "arduino-registrations",
-        storageBucket: "arduino-registrations.appspot.com",
-        messagingSenderId: "628252066469",
-        appId: "1:628252066469:web:8c1a0dd33d71c9fa6c834c"
-      };
+  <h3>📌 Belum ada akaun? Daftar di sini:</h3>
+  <div class="form-group">
+    <input type="text" id="registerName" placeholder="Nama Penuh" required />
+  </div>
+  <div class="form-group">
+    <input type="number" id="registerAge" placeholder="Umur" required />
+  </div>
+  <div class="form-group">
+    <input type="email" id="registerEmail" placeholder="Email" required />
+  </div>
+  <div class="form-group">
+    <input type="password" id="registerPassword" placeholder="Kata Laluan" required />
+  </div>
+  <div class="form-group">
+    <input type="password" id="confirmPassword" placeholder="Sahkan Kata Laluan" required />
+  </div>
+  <button class="btn" onclick="register()">Daftar</button>
 
-      firebase.initializeApp(firebaseConfig);
-      const db = firebase.firestore();
+  <p id="authMessage"></p>
+</div>
 
-      document.getElementById("arduinoForm").addEventListener("submit", function(event) {
-        event.preventDefault();
+<!-- ✅ MAIN CONTENT -->
+<div id="mainContent">
+  <h1>Arduino: Pelajar Sekolah Menjadi Teknorat Terbilang</h1>
+  <p class="intro">Selamat datang ke portal pembelajaran Arduino! Anda kini log masuk.</p>
+  <button class="btn" onclick="logout()">Log Keluar</button>
+</div>
 
-        const name = document.getElementById("name").value;
-        const email = document.getElementById("email").value;
-        const age = document.getElementById("age").value;
-        const project = document.getElementById("project").value;
+<!-- ✅ Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
-        db.collection("arduino_registrations").add({
-          name, email, age, project,
-          timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        })
-        .then(() => {
-          const formResult = document.getElementById("formResult");
-          formResult.innerHTML = `<div class="result-message result-success">✅ Terima kasih, ${name}! Data telah disimpan dalam Firebase.</div>`;
-          formResult.classList.add
+<script>
+  // Firebase Config
+  const firebaseConfig = {
+    apiKey: "AIzaSyD02BBBqbetJ2MV6tl2WBysXyIWXKGB7xI",
+    authDomain: "arduino-registrations.firebaseapp.com",
+    projectId: "arduino-registrations",
+    storageBucket: "arduino-registrations.appspot.com",
+    messagingSenderId: "628252066469",
+    appId: "1:628252066469:web:8c1a0dd33d71c9fa6c834c"
+  };
+
+  // Init Firebase
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  // Register function
+  function register() {
+    const name = document.getElementById("registerName").value;
+    const age = document.getElementById("registerAge").value;
+    const email = document.getElementById("registerEmail").value;
+    const password = document.getElementById("registerPassword").value;
+    const confirmPassword = document.getElementById("confirmPassword").value;
+
+    if (password !== confirmPassword) {
+      document.getElementById("authMessage").innerText = "❌ Kata laluan tidak sepadan.";
+      return;
+    }
+
+    auth.createUserWithEmailAndPassword(email, password)
+      .then((userCredential) => {
+        const uid = userCredential.user.uid;
+        return db.collection("users").doc(uid).set({
+          name: name,
+          age: age,
+          email: email,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      })
+      .then(() => {
+        document.getElementById("authMessage").innerText = "✅ Pendaftaran berjaya! Sila log masuk.";
+      })
+      .catch((error) => {
+        document.getElementById("authMessage").innerText = "❌ " + error.message;
+      });
+  }
+
+  // Login function
+  function login() {
+    const email = document.getElementById("loginEmail").value;
+    const password = document.getElementById("loginPassword").value;
+
+    auth.signInWithEmailAndPassword(email, password)
+      .then(() => {
+        document.getElementById("authSection").style.display = "none";
+        document.getElementById("mainContent").style.display = "block";
+      })
+      .catch((error) => {
+        document.getElementById("authMessage").innerText = "❌ " + error.message;
+      });
+  }
+
+  // Logout
+  function logout() {
+    auth.signOut().then(() => {
+      document.getElementById("authSection").style.display = "block";
+      document.getElementById("mainContent").style.display = "none";
+    });
+  }
+
+  // Auto login check
+  auth.onAuthStateChanged((user) => {
+    if (user) {
+      document.getElementById("authSection").style.display = "none";
+      document.getElementById("mainContent").style.display = "block";
+    } else {
+      document.getElementById("authSection").style.display = "block";
+      document.getElementById("mainContent").style.display = "none";
+    }
+  });
+</script>
+
+</body>
+</html>
