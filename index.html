@@ -48,6 +48,8 @@
       box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
       margin-bottom: 20px;
       text-align: center;
+      width: 100%;
+      max-width: 600px;
     }
     #mainContent {
       display: none;
@@ -56,6 +58,8 @@
   </style>
 </head>
 <body>
+<audio id="correctSound" src="https://www.soundjay.com/button/beep-07.wav" preload="auto"></audio>
+<audio id="wrongSound" src="https://www.soundjay.com/button/beep-10.wav" preload="auto"></audio>
 
 <!-- 🔐 LOGIN & REGISTER SECTION -->
 <div id="authSection">
@@ -85,26 +89,19 @@
     <input type="password" id="confirmPassword" placeholder="Sahkan Kata Laluan" required />
   </div>
   <button class="btn" onclick="register()">Daftar</button>
-
   <p id="authMessage"></p>
 </div>
 
 <!-- ✅ MAIN CONTENT -->
 <div id="mainContent">
   <div class="card">
-    <h1>CABARAN INOVASI</h1>
+    <h1>Selamat Datang</h1>
     <button class="btn" onclick="logout()">Log Keluar</button>
   </div>
 
   <div class="card">
     <h3>Tentang Kami</h3>
-    <p>Kami bersemangat terhadap teknologi dan pendidikan, menyediakan pengalaman pembelajaran melalui projek Arduino & latihan kejuruteraan perisian.</p>
-    <p>Misi kami adalah untuk menghubungkan inovasi dengan pembelajaran, membina penyelesaian kreatif dan praktikal.</p>
-  </div>
-
-  <div class="card">
-    <h3>Latihan Projek</h3>
-    <p>ARDUINO CONTROLLED CAR | ARDUINO WORKSHOP | PROJEK SEKOLAH | SOFTWARE ENGINEERING</p>
+    <p>Kami bersemangat terhadap teknologi dan pendidikan...</p>
   </div>
 
   <div class="card">
@@ -124,30 +121,45 @@
     <button class="btn" onclick="startQuiz('arduino')">Kuiz Arduino</button>
     <button class="btn" onclick="startQuiz('circuit')">Kuiz Litar</button>
     <button class="btn" onclick="startQuiz('programming')">Kuiz Pengaturcaraan</button>
-    <div id="question" style="margin-top:20px;"></div>
+    <div id="question"></div>
     <div id="quiz-options"></div>
     <div id="quiz-result"></div>
+    <progress id="quizProgress" value="0" max="100" style="width:100%; height: 20px;"></progress>
+  </div>
+
+  <div class="card">
+    <h3>💬 Maklum Balas</h3>
+    <textarea id="feedbackText" placeholder="Tulis maklum balas anda..."></textarea><br>
+    <button class="btn" onclick="submitFeedback()">Hantar</button>
+    <p id="feedbackResult"></p>
   </div>
 </div>
 
-<!-- ✅ Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-
 <script>
   const firebaseConfig = {
-    apiKey: "AIzaSyD02BBBqbetJ2MV6tl2WBysXyIWXKGB7xI",
-    authDomain: "arduino-registrations.firebaseapp.com",
-    projectId: "arduino-registrations",
-    storageBucket: "arduino-registrations.appspot.com",
-    messagingSenderId: "628252066469",
-    appId: "1:628252066469:web:8c1a0dd33d71c9fa6c834c"
+    // 🛠️ Replace with your actual Firebase config
   };
-
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
   const db = firebase.firestore();
+
+  auth.onAuthStateChanged(user => {
+    if (user) {
+      document.getElementById("authSection").style.display = "none";
+      document.getElementById("mainContent").style.display = "block";
+      db.collection("users").doc(auth.currentUser.uid).get().then(doc => {
+        if (doc.exists) {
+          document.querySelector('.card h1').innerText = `Selamat Datang, ${doc.data().name}`;
+        }
+      });
+    } else {
+      document.getElementById("authSection").style.display = "block";
+      document.getElementById("mainContent").style.display = "none";
+    }
+  });
 
   function register() {
     const name = document.getElementById("registerName").value;
@@ -155,59 +167,39 @@
     const email = document.getElementById("registerEmail").value;
     const password = document.getElementById("registerPassword").value;
     const confirmPassword = document.getElementById("confirmPassword").value;
-    const message = document.getElementById("authMessage");
 
     if (password !== confirmPassword) {
-      message.innerText = "❌ Kata laluan tidak sepadan.";
+      document.getElementById("authMessage").innerText = "❌ Kata laluan tidak sepadan.";
       return;
     }
 
     auth.createUserWithEmailAndPassword(email, password)
-      .then(userCredential => {
-        const uid = userCredential.user.uid;
-        return db.collection("users").doc(uid).set({
-          name, age, email,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        }).then(() => {
-          message.innerHTML = `✅ Terima kasih ${name}, pendaftaran anda berjaya!<br>📧 Email: ${email}<br>🎂 Umur: ${age}`;
-          console.log(`👤 Pengguna baru didaftar:\nNama: ${name}\nUmur: ${age}\nEmail: ${email}`);
+      .then(cred => {
+        return db.collection("users").doc(cred.user.uid).set({
+          name, age, email, createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
       })
-      .catch(error => {
-        message.innerText = "❌ " + error.message;
-      });
-  }
-
-  function login() {
-    const email = document.getElementById("loginEmail").value;
-    const password = document.getElementById("loginPassword").value;
-
-    auth.signInWithEmailAndPassword(email, password)
       .then(() => {
-        document.getElementById("authSection").style.display = "none";
-        document.getElementById("mainContent").style.display = "block";
+        document.getElementById("authMessage").innerText = "✅ Akaun berjaya didaftarkan!";
+        login(); // Auto login after registration
       })
       .catch(error => {
         document.getElementById("authMessage").innerText = "❌ " + error.message;
       });
   }
 
-  function logout() {
-    auth.signOut().then(() => {
-      document.getElementById("authSection").style.display = "block";
-      document.getElementById("mainContent").style.display = "none";
-    });
+  function login() {
+    const email = document.getElementById("loginEmail").value;
+    const password = document.getElementById("loginPassword").value;
+    auth.signInWithEmailAndPassword(email, password)
+      .catch(error => {
+        document.getElementById("authMessage").innerText = "❌ " + error.message;
+      });
   }
 
-  auth.onAuthStateChanged(user => {
-    if (user) {
-      document.getElementById("authSection").style.display = "none";
-      document.getElementById("mainContent").style.display = "block";
-    } else {
-      document.getElementById("authSection").style.display = "block";
-      document.getElementById("mainContent").style.display = "none";
-    }
-  });
+  function logout() {
+    auth.signOut();
+  }
 
   document.getElementById("arduinoForm").addEventListener("submit", function(event) {
     event.preventDefault();
@@ -219,33 +211,37 @@
     db.collection("arduino_registrations").add({
       name, email, age, project,
       timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    })
-    .then(() => {
+    }).then(() => {
       document.getElementById("formResult").innerText = `✅ Terima kasih, ${name}!`;
-      document.getElementById("arduinoForm").reset();
-    })
-    .catch((error) => {
-      document.getElementById("formResult").innerText = "❌ Ralat menyimpan data.";
     });
   });
 
+  function submitFeedback() {
+    const feedback = document.getElementById("feedbackText").value;
+    if (!auth.currentUser) return;
+    db.collection("feedbacks").add({
+      uid: auth.currentUser.uid,
+      text: feedback,
+      time: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(() => {
+      document.getElementById("feedbackResult").innerText = "✅ Maklum balas dihantar. Terima kasih!";
+      document.getElementById("feedbackText").value = "";
+    });
+  }
+
   const quizzes = {
     arduino: [
-      { question: "Apakah itu Arduino?", options: ["Robot", "Platform mikropengawal", "Sensor"], answer: "Platform mikropengawal" },
-      { question: "Bahasa apakah digunakan dalam Arduino IDE?", options: ["Python", "C++", "Java"], answer: "C++" }
+      { question: "Apakah itu Arduino?", options: ["Sensor", "Mikropengawal", "Kapasitor"], answer: "Mikropengawal" }
     ],
     circuit: [
-      { question: "Apakah komponen utama untuk menyimpan cas?", options: ["Perintang", "Kapasitor", "LED"], answer: "Kapasitor" },
-      { question: "Apakah simbol bagi arus terus (DC)?", options: ["~", "-", "="], answer: "=" }
+      { question: "Unit SI untuk arus?", options: ["Ohm", "Ampere", "Volt"], answer: "Ampere" }
     ],
     programming: [
-      { question: "Apa itu 'loop()' dalam Arduino?", options: ["Fungsi utama", "Sensor", "Pin digital"], answer: "Fungsi utama" },
-      { question: "Kod manakah betul untuk hidupkan LED?", options: ["digitalWrite(13, HIGH);", "led.on();", "turnOn(LED);"], answer: "digitalWrite(13, HIGH);" }
+      { question: "Bahasa utama Arduino?", options: ["Python", "C++", "Java"], answer: "C++" }
     ]
   };
 
-  let currentQuiz = [];
-  let currentQuestionIndex = 0;
+  let currentQuiz = [], currentQuestionIndex = 0;
 
   function startQuiz(category) {
     currentQuiz = quizzes[category];
@@ -257,11 +253,11 @@
     if (currentQuestionIndex < currentQuiz.length) {
       const q = currentQuiz[currentQuestionIndex];
       document.getElementById("question").innerText = q.question;
-      document.getElementById("quiz-options").innerHTML = q.options.map(option =>
-        `<button class="btn" onclick="checkAnswer('${option}')">${option}</button>`).join('');
+      document.getElementById("quiz-options").innerHTML = q.options.map(option => `<button class="btn" onclick="checkAnswer('${option}')">${option}</button>`).join('');
+      document.getElementById("quizProgress").value = (currentQuestionIndex / currentQuiz.length) * 100;
       document.getElementById("quiz-result").innerText = "";
     } else {
-      document.getElementById("quiz-result").innerText = "✅ Anda telah tamat kuiz!";
+      document.getElementById("quiz-result").innerHTML = "✅ Anda telah tamat kuiz!<br>🏆 Tahniah!";
       document.getElementById("question").innerText = "";
       document.getElementById("quiz-options").innerHTML = "";
     }
@@ -269,17 +265,15 @@
 
   function checkAnswer(selectedAnswer) {
     const correctAnswer = currentQuiz[currentQuestionIndex].answer;
-    document.getElementById("quiz-result").innerText =
-      selectedAnswer === correctAnswer ? "✅ Betul!" : "❌ Salah! Jawapan betul: " + correctAnswer;
+    const isCorrect = selectedAnswer === correctAnswer;
+    document.getElementById("quiz-result").innerText = isCorrect ? `✅ Betul! (${currentQuestionIndex + 1}/${currentQuiz.length})` : `❌ Salah! Jawapan betul: ${correctAnswer}`;
+    document.getElementById(isCorrect ? "correctSound" : "wrongSound").play();
     currentQuestionIndex++;
     setTimeout(showQuestion, 1500);
   }
-
-  window.startQuiz = startQuiz;
-  window.checkAnswer = checkAnswer;
 </script>
-
 </body>
 </html>
+
 
 
