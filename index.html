@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="ms">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Arduino Learning Portal</title>
   <style>
     body {
@@ -65,39 +65,38 @@
       color: white;
     }
   </style>
-
-  <!-- ACE Editor -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ace.js"></script>
 </head>
 <body>
-<audio id="correctSound" src="https://www.soundjay.com/button/beep-07.wav" preload="auto"></audio>
-<audio id="wrongSound" src="https://www.soundjay.com/button/beep-10.wav" preload="auto"></audio>
+
+<audio id="correctSound" src="https://audio-source/correct.mp3" preload="auto"></audio>
+<audio id="wrongSound" src="https://audio-source/wrong.mp3" preload="auto"></audio>
 
 <div id="authSection">
   <h2>🔐 Log Masuk</h2>
   <div class="form-group">
-    <input type="email" id="loginEmail" placeholder="Email" required />
+    <input type="email" id="loginEmail" placeholder="Email" required>
   </div>
   <div class="form-group">
-    <input type="password" id="loginPassword" placeholder="Kata Laluan" required />
+    <input type="password" id="loginPassword" placeholder="Kata Laluan" required>
   </div>
   <button class="btn" onclick="login()">Log Masuk</button>
-
+  
   <h3>📌 Belum ada akaun? Daftar di sini:</h3>
   <div class="form-group">
-    <input type="text" id="registerName" placeholder="Nama Penuh" required />
+    <input type="text" id="registerName" placeholder="Nama Penuh" required>
   </div>
   <div class="form-group">
-    <input type="number" id="registerAge" placeholder="Umur" required />
+    <input type="number" id="registerAge" placeholder="Umur" required>
   </div>
   <div class="form-group">
-    <input type="email" id="registerEmail" placeholder="Email" required />
+    <input type="email" id="registerEmail" placeholder="Email" required>
   </div>
   <div class="form-group">
-    <input type="password" id="registerPassword" placeholder="Kata Laluan" required />
+    <input type="password" id="registerPassword" placeholder="Kata Laluan" required>
   </div>
   <div class="form-group">
-    <input type="password" id="confirmPassword" placeholder="Sahkan Kata Laluan" required />
+    <input type="password" id="confirmPassword" placeholder="Sahkan Kata Laluan" required>
   </div>
   <button class="btn" onclick="register()">Daftar</button>
   <p id="authMessage"></p>
@@ -109,26 +108,17 @@
     <button class="btn" onclick="logout()">Log Keluar</button>
   </div>
 
-  <!-- Tutorial Section -->
   <div class="card">
     <h2>📘 Tutorial Arduino</h2>
     <details><summary>🔰 Pengenalan</summary><p>Arduino ialah mikropengawal open-source.</p></details>
     <details><summary>💡 LED Blink</summary><p>Gunakan `digitalWrite(LED_BUILTIN, HIGH);`</p></details>
   </div>
 
-  <!-- Circuit Simulator -->
   <div class="card">
     <h2>🛠️ Simulasi Litar</h2>
     <a href="https://www.tinkercad.com/circuits" target="_blank" class="btn">🔌 Buka Tinkercad</a>
   </div>
-
-  <!-- Code Editor -->
-  <div class="card">
-    <h2>👨‍💻 Editor Kod Arduino</h2>
-    <div id="editor" style="height: 200px; width: 100%;">// Tulis kod Arduino anda di sini...</div>
-  </div>
-
-  <!-- Quiz Section -->
+  
   <div class="card">
     <h2>🎯 Kuiz Arduino</h2>
     <button class="btn" onclick="startQuiz('arduino')">Mula Kuiz</button>
@@ -138,53 +128,17 @@
     <progress id="quizProgress" value="0" max="100" style="width:100%; height: 20px;"></progress>
   </div>
 
-  <!-- Certificate -->
   <div id="certificate" class="card" style="display:none;">
     <h2>🏆 Sijil Penyertaan</h2>
     <p id="certName"></p>
     <p>Anda telah tamat kuiz dengan skor cemerlang!</p>
   </div>
-
-  <!-- Dark Mode -->
-  <div class="card">
-    <h2>🌙 Tema</h2>
-    <button class="btn" onclick="toggleDarkMode()">Tukar Tema</button>
-  </div>
 </div>
 
-<!-- Firebase SDKs -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-
-<!-- Firebase Config -->
 <script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyD02BBBqbetJ2MV6tl2WBysXyIWXKGB7xI",
-    authDomain: "arduino-registrations.firebaseapp.com",
-    projectId: "arduino-registrations",
-    storageBucket: "arduino-registrations.appspot.com",
-    messagingSenderId: "628252066469",
-    appId: "1:628252066469:web:8c1a0dd33d71c9fa6c834c"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.firestore();
-</script>
-
-<!-- App Logic -->
-<script>
-  let currentQuiz = [], currentQuestionIndex = 0, score = 0;
-  const quizzes = {
-    arduino: [
-      { question: "Apakah itu Arduino?", options: ["Robot", "Sensor", "Mikropengawal", "Perisian"], answer: "Mikropengawal" },
-      { question: "Arduino UNO menggunakan cip apa?", options: ["ATmega328P", "ESP32", "PIC16F877A", "ARM Cortex"], answer: "ATmega328P" }
-    ]
-  };
-
   function register() {
-    const name = registerName.value, age = registerAge.value, email = registerEmail.value,
-          password = registerPassword.value, confirm = confirmPassword.value;
+    let name = registerName.value, age = registerAge.value, email = registerEmail.value;
+    let password = registerPassword.value, confirm = confirmPassword.value;
     if (password !== confirm) return authMessage.innerText = "❌ Kata laluan tidak sepadan.";
     auth.createUserWithEmailAndPassword(email, password)
       .then(cred => db.collection("users").doc(cred.user.uid).set({ name, age, email }))
@@ -197,9 +151,6 @@
       .then(() => {
         authSection.style.display = "none";
         mainContent.style.display = "block";
-        db.collection("users").doc(auth.currentUser.uid).get().then(doc => {
-          document.querySelector('.card h1').innerText = `Selamat Datang, ${doc.data().name}`;
-        });
       })
       .catch(err => authMessage.innerText = `❌ ${err.message}`);
   }
@@ -211,53 +162,10 @@
     });
   }
 
-  auth.onAuthStateChanged(user => user ? login() : logout());
-
   function toggleDarkMode() {
     document.body.classList.toggle("dark-mode");
   }
-
-  const editor = ace.edit("editor");
-  editor.setTheme("ace/theme/monokai");
-  editor.session.setMode("ace/mode/c_cpp");
-
-  function startQuiz(category) {
-    currentQuiz = quizzes[category];
-    currentQuestionIndex = 0;
-    score = 0;
-    showQuestion();
-  }
-
-  function showQuestion() {
-    if (currentQuestionIndex < currentQuiz.length) {
-      const q = currentQuiz[currentQuestionIndex];
-      question.innerText = q.question;
-      quiz-options.innerHTML = q.options.map(opt => `<button class="btn" onclick="checkAnswer('${opt}')">${opt}</button>`).join('');
-      quizProgress.value = (currentQuestionIndex / currentQuiz.length) * 100;
-      quiz-result.innerText = "";
-    } else {
-      quiz-result.innerHTML = `✅ Tamat! Skor anda: ${score}/${currentQuiz.length}`;
-      generateCertificate(score);
-    }
-  }
-
-  function checkAnswer(selected) {
-    const correct = currentQuiz[currentQuestionIndex].answer;
-    const isCorrect = selected === correct;
-    if (isCorrect) score++;
-    quiz-result.innerText = isCorrect ? "✅ Betul!" : `❌ Salah! Jawapan betul: ${correct}`;
-    document.getElementById(isCorrect ? "correctSound" : "wrongSound").play();
-    currentQuestionIndex++;
-    setTimeout(showQuestion, 1500);
-  }
-
-  function generateCertificate(score) {
-    if (score >= currentQuiz.length) {
-      certificate.style.display = "block";
-      certName.innerText = `Nama: ${auth.currentUser.email}`;
-    }
-  }
 </script>
+
 </body>
 </html>
-
