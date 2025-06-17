@@ -13,6 +13,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      transition: background 0.3s, color 0.3s;
     }
     h1, p.intro {
       font-family: 'Courier New', monospace;
@@ -55,13 +56,23 @@
       display: none;
       width: 100%;
     }
+    .dark-mode {
+      background-color: #121212;
+      color: #e0e0e0;
+    }
+    .dark-mode .card {
+      background-color: #1e1e1e;
+      color: white;
+    }
   </style>
+
+  <!-- ACE Editor -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ace.js"></script>
 </head>
 <body>
 <audio id="correctSound" src="https://www.soundjay.com/button/beep-07.wav" preload="auto"></audio>
 <audio id="wrongSound" src="https://www.soundjay.com/button/beep-10.wav" preload="auto"></audio>
 
-<!-- 🔐 LOGIN & REGISTER SECTION -->
 <div id="authSection">
   <h2>🔐 Log Masuk</h2>
   <div class="form-group">
@@ -92,61 +103,67 @@
   <p id="authMessage"></p>
 </div>
 
-<!-- ✅ MAIN CONTENT -->
 <div id="mainContent">
   <div class="card">
     <h1>Selamat Datang</h1>
     <button class="btn" onclick="logout()">Log Keluar</button>
   </div>
 
+  <!-- Tutorial Section -->
   <div class="card">
-    <h3>Tentang Kami</h3>
-    <p>Kami bersemangat terhadap teknologi dan pendidikan...</p>
+    <h2>📘 Tutorial Arduino</h2>
+    <details><summary>🔰 Pengenalan</summary><p>Arduino ialah mikropengawal open-source.</p></details>
+    <details><summary>💡 LED Blink</summary><p>Gunakan `digitalWrite(LED_BUILTIN, HIGH);`</p></details>
   </div>
 
+  <!-- Circuit Simulator -->
   <div class="card">
-    <h2>📋 Pendaftaran Arduino</h2>
-    <form id="arduinoForm">
-      <input type="text" id="name" placeholder="Nama" required><br>
-      <input type="email" id="email" placeholder="Email" required><br>
-      <input type="number" id="age" placeholder="Umur" required><br>
-      <textarea id="project" placeholder="Nyatakan projek anda" required></textarea><br>
-      <button type="submit" class="btn">Hantar</button>
-    </form>
-    <div id="formResult"></div>
+    <h2>🛠️ Simulasi Litar</h2>
+    <a href="https://www.tinkercad.com/circuits" target="_blank" class="btn">🔌 Buka Tinkercad</a>
   </div>
 
+  <!-- Code Editor -->
   <div class="card">
-    <h2>🎯 Kuiz Arduino & Elektronik</h2>
-    <button class="btn" onclick="startQuiz('arduino')">Kuiz Arduino</button>
-    <button class="btn" onclick="startQuiz('circuit')">Kuiz Litar</button>
-    <button class="btn" onclick="startQuiz('programming')">Kuiz Pengaturcaraan</button>
+    <h2>👨‍💻 Editor Kod Arduino</h2>
+    <div id="editor" style="height: 200px; width: 100%;">// Tulis kod Arduino anda di sini...</div>
+  </div>
+
+  <!-- Quiz Section -->
+  <div class="card">
+    <h2>🎯 Kuiz Arduino</h2>
+    <button class="btn" onclick="startQuiz('arduino')">Mula Kuiz</button>
     <div id="question"></div>
     <div id="quiz-options"></div>
     <div id="quiz-result"></div>
     <progress id="quizProgress" value="0" max="100" style="width:100%; height: 20px;"></progress>
   </div>
 
+  <!-- Certificate -->
+  <div id="certificate" class="card" style="display:none;">
+    <h2>🏆 Sijil Penyertaan</h2>
+    <p id="certName"></p>
+    <p>Anda telah tamat kuiz dengan skor cemerlang!</p>
+  </div>
+
+  <!-- Dark Mode -->
   <div class="card">
-    <h3>💬 Maklum Balas</h3>
-    <textarea id="feedbackText" placeholder="Tulis maklum balas anda..."></textarea><br>
-    <button class="btn" onclick="submitFeedback()">Hantar</button>
-    <p id="feedbackResult"></p>
+    <h2>🌙 Tema</h2>
+    <button class="btn" onclick="toggleDarkMode()">Tukar Tema</button>
   </div>
 </div>
 
-<!-- Firebase SDK -->
+<!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
-<!-- Firebase Init -->
+<!-- Firebase Config -->
 <script>
   const firebaseConfig = {
     apiKey: "AIzaSyD02BBBqbetJ2MV6tl2WBysXyIWXKGB7xI",
     authDomain: "arduino-registrations.firebaseapp.com",
     projectId: "arduino-registrations",
-    storageBucket: "arduino-registrations.firebasestorage.app",
+    storageBucket: "arduino-registrations.appspot.com",
     messagingSenderId: "628252066469",
     appId: "1:628252066469:web:8c1a0dd33d71c9fa6c834c"
   };
@@ -157,124 +174,90 @@
 
 <!-- App Logic -->
 <script>
-  function register() {
-    const name = document.getElementById("registerName").value;
-    const age = document.getElementById("registerAge").value;
-    const email = document.getElementById("registerEmail").value;
-    const password = document.getElementById("registerPassword").value;
-    const confirm = document.getElementById("confirmPassword").value;
-    const msg = document.getElementById("authMessage");
-
-    if (password !== confirm) {
-      msg.innerText = "❌ Kata laluan tidak sepadan.";
-      return;
-    }
-
-    auth.createUserWithEmailAndPassword(email, password).then(cred => {
-      return db.collection("users").doc(cred.user.uid).set({ name, age, email });
-    }).then(() => {
-      msg.innerText = "✅ Pendaftaran berjaya!";
-    }).catch(err => {
-      msg.innerText = `❌ ${err.message}`;
-    });
-  }
-
-  function login() {
-    const email = document.getElementById("loginEmail").value;
-    const password = document.getElementById("loginPassword").value;
-    auth.signInWithEmailAndPassword(email, password).then(() => {
-      document.getElementById("authSection").style.display = "none";
-      document.getElementById("mainContent").style.display = "block";
-      db.collection("users").doc(auth.currentUser.uid).get().then(doc => {
-        document.querySelector('.card h1').innerText = `Selamat Datang, ${doc.data().name}`;
-      });
-    }).catch(err => {
-      document.getElementById("authMessage").innerText = `❌ ${err.message}`;
-    });
-  }
-
-  function logout() {
-    auth.signOut().then(() => {
-      document.getElementById("authSection").style.display = "block";
-      document.getElementById("mainContent").style.display = "none";
-    });
-  }
-
-  auth.onAuthStateChanged(user => {
-    if (user) login();
-    else logout();
-  });
-
-  document.getElementById("arduinoForm").addEventListener("submit", function(event) {
-    event.preventDefault();
-    const name = document.getElementById("name").value;
-    const email = document.getElementById("email").value;
-    const age = document.getElementById("age").value;
-    const project = document.getElementById("project").value;
-    db.collection("arduino_registrations").add({
-      name, email, age, project,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(() => {
-      document.getElementById("formResult").innerText = `✅ Terima kasih, ${name}!`;
-    });
-  });
-
-  function submitFeedback() {
-    const feedback = document.getElementById("feedbackText").value;
-    db.collection("feedbacks").add({
-      uid: auth.currentUser.uid,
-      text: feedback,
-      time: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(() => {
-      document.getElementById("feedbackResult").innerText = "✅ Maklum balas dihantar. Terima kasih!";
-      document.getElementById("feedbackText").value = "";
-    });
-  }
-
+  let currentQuiz = [], currentQuestionIndex = 0, score = 0;
   const quizzes = {
     arduino: [
       { question: "Apakah itu Arduino?", options: ["Robot", "Sensor", "Mikropengawal", "Perisian"], answer: "Mikropengawal" },
       { question: "Arduino UNO menggunakan cip apa?", options: ["ATmega328P", "ESP32", "PIC16F877A", "ARM Cortex"], answer: "ATmega328P" }
-    ],
-    circuit: [
-      { question: "Apakah unit bagi voltan?", options: ["Ampere", "Watt", "Volt", "Ohm"], answer: "Volt" }
-    ],
-    programming: [
-      { question: "Apakah simbol untuk komen dalam Arduino C++?", options: ["//", "/* */", "#", "--"], answer: "//" }
     ]
   };
 
-  let currentQuiz = [], currentQuestionIndex = 0;
+  function register() {
+    const name = registerName.value, age = registerAge.value, email = registerEmail.value,
+          password = registerPassword.value, confirm = confirmPassword.value;
+    if (password !== confirm) return authMessage.innerText = "❌ Kata laluan tidak sepadan.";
+    auth.createUserWithEmailAndPassword(email, password)
+      .then(cred => db.collection("users").doc(cred.user.uid).set({ name, age, email }))
+      .then(() => authMessage.innerText = "✅ Pendaftaran berjaya!")
+      .catch(err => authMessage.innerText = `❌ ${err.message}`);
+  }
+
+  function login() {
+    auth.signInWithEmailAndPassword(loginEmail.value, loginPassword.value)
+      .then(() => {
+        authSection.style.display = "none";
+        mainContent.style.display = "block";
+        db.collection("users").doc(auth.currentUser.uid).get().then(doc => {
+          document.querySelector('.card h1').innerText = `Selamat Datang, ${doc.data().name}`;
+        });
+      })
+      .catch(err => authMessage.innerText = `❌ ${err.message}`);
+  }
+
+  function logout() {
+    auth.signOut().then(() => {
+      authSection.style.display = "block";
+      mainContent.style.display = "none";
+    });
+  }
+
+  auth.onAuthStateChanged(user => user ? login() : logout());
+
+  function toggleDarkMode() {
+    document.body.classList.toggle("dark-mode");
+  }
+
+  const editor = ace.edit("editor");
+  editor.setTheme("ace/theme/monokai");
+  editor.session.setMode("ace/mode/c_cpp");
 
   function startQuiz(category) {
     currentQuiz = quizzes[category];
     currentQuestionIndex = 0;
+    score = 0;
     showQuestion();
   }
 
   function showQuestion() {
     if (currentQuestionIndex < currentQuiz.length) {
       const q = currentQuiz[currentQuestionIndex];
-      document.getElementById("question").innerText = q.question;
-      document.getElementById("quiz-options").innerHTML = q.options.map(option =>
-        `<button class="btn" onclick="checkAnswer('${option}')">${option}</button>`).join('');
-      document.getElementById("quizProgress").value = (currentQuestionIndex / currentQuiz.length) * 100;
-      document.getElementById("quiz-result").innerText = "";
+      question.innerText = q.question;
+      quiz-options.innerHTML = q.options.map(opt => `<button class="btn" onclick="checkAnswer('${opt}')">${opt}</button>`).join('');
+      quizProgress.value = (currentQuestionIndex / currentQuiz.length) * 100;
+      quiz-result.innerText = "";
     } else {
-      document.getElementById("quiz-result").innerHTML = "✅ Anda telah tamat kuiz!<br>🏆 Tahniah!";
-      document.getElementById("question").innerText = "";
-      document.getElementById("quiz-options").innerHTML = "";
+      quiz-result.innerHTML = `✅ Tamat! Skor anda: ${score}/${currentQuiz.length}`;
+      generateCertificate(score);
     }
   }
 
-  function checkAnswer(selectedAnswer) {
-    const correctAnswer = currentQuiz[currentQuestionIndex].answer;
-    const isCorrect = selectedAnswer === correctAnswer;
-    document.getElementById("quiz-result").innerText = isCorrect ? `✅ Betul! (${currentQuestionIndex + 1}/${currentQuiz.length})` : `❌ Salah! Jawapan betul: ${correctAnswer}`;
+  function checkAnswer(selected) {
+    const correct = currentQuiz[currentQuestionIndex].answer;
+    const isCorrect = selected === correct;
+    if (isCorrect) score++;
+    quiz-result.innerText = isCorrect ? "✅ Betul!" : `❌ Salah! Jawapan betul: ${correct}`;
     document.getElementById(isCorrect ? "correctSound" : "wrongSound").play();
     currentQuestionIndex++;
     setTimeout(showQuestion, 1500);
   }
+
+  function generateCertificate(score) {
+    if (score >= currentQuiz.length) {
+      certificate.style.display = "block";
+      certName.innerText = `Nama: ${auth.currentUser.email}`;
+    }
+  }
 </script>
 </body>
 </html>
+
