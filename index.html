@@ -15,10 +15,6 @@
       align-items: center;
       transition: background 0.3s, color 0.3s;
     }
-    h1, p.intro {
-      font-family: 'Courier New', monospace;
-      font-weight: bold;
-    }
     .form-group, .section {
       margin-bottom: 20px;
       width: 80%;
@@ -34,13 +30,6 @@
     }
     .btn:hover {
       background: #0056b3;
-    }
-    input, textarea {
-      width: 100%;
-      padding: 8px;
-      margin-top: 5px;
-      border-radius: 4px;
-      border: 1px solid #ccc;
     }
     .card {
       background: white;
@@ -65,12 +54,33 @@
       color: white;
     }
   </style>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ace.js"></script>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+  <!-- Firebase Config -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyD02BBBqbetJ2MV6tl2WBysXyIWXKGB7xI",
+      authDomain: "arduino-registrations.firebaseapp.com",
+      projectId: "arduino-registrations",
+      storageBucket: "arduino-registrations.appspot.com",
+      messagingSenderId: "628252066469",
+      appId: "1:628252066469:web:8c1a0dd33d71c9fa6c834c"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+  </script>
 </head>
 <body>
 
-<audio id="correctSound" src="https://audio-source/correct.mp3" preload="auto"></audio>
-<audio id="wrongSound" src="https://audio-source/wrong.mp3" preload="auto"></audio>
+<audio id="correctSound" src="https://www.soundjay.com/button/beep-07.wav" preload="auto"></audio>
+<audio id="wrongSound" src="https://www.soundjay.com/button/beep-10.wav" preload="auto"></audio>
 
 <div id="authSection">
   <h2>🔐 Log Masuk</h2>
@@ -87,16 +97,10 @@
     <input type="text" id="registerName" placeholder="Nama Penuh" required>
   </div>
   <div class="form-group">
-    <input type="number" id="registerAge" placeholder="Umur" required>
-  </div>
-  <div class="form-group">
     <input type="email" id="registerEmail" placeholder="Email" required>
   </div>
   <div class="form-group">
     <input type="password" id="registerPassword" placeholder="Kata Laluan" required>
-  </div>
-  <div class="form-group">
-    <input type="password" id="confirmPassword" placeholder="Sahkan Kata Laluan" required>
   </div>
   <button class="btn" onclick="register()">Daftar</button>
   <p id="authMessage"></p>
@@ -109,61 +113,88 @@
   </div>
 
   <div class="card">
-    <h2>📘 Tutorial Arduino</h2>
-    <details><summary>🔰 Pengenalan</summary><p>Arduino ialah mikropengawal open-source.</p></details>
-    <details><summary>💡 LED Blink</summary><p>Gunakan `digitalWrite(LED_BUILTIN, HIGH);`</p></details>
-  </div>
-
-  <div class="card">
-    <h2>🛠️ Simulasi Litar</h2>
-    <a href="https://www.tinkercad.com/circuits" target="_blank" class="btn">🔌 Buka Tinkercad</a>
-  </div>
-  
-  <div class="card">
     <h2>🎯 Kuiz Arduino</h2>
-    <button class="btn" onclick="startQuiz('arduino')">Mula Kuiz</button>
+    <button class="btn" onclick="startQuiz()">Mula Kuiz</button>
     <div id="question"></div>
     <div id="quiz-options"></div>
     <div id="quiz-result"></div>
-    <progress id="quizProgress" value="0" max="100" style="width:100%; height: 20px;"></progress>
-  </div>
-
-  <div id="certificate" class="card" style="display:none;">
-    <h2>🏆 Sijil Penyertaan</h2>
-    <p id="certName"></p>
-    <p>Anda telah tamat kuiz dengan skor cemerlang!</p>
   </div>
 </div>
 
 <script>
   function register() {
-    let name = registerName.value, age = registerAge.value, email = registerEmail.value;
-    let password = registerPassword.value, confirm = confirmPassword.value;
-    if (password !== confirm) return authMessage.innerText = "❌ Kata laluan tidak sepadan.";
+    const name = document.getElementById("registerName").value;
+    const email = document.getElementById("registerEmail").value;
+    const password = document.getElementById("registerPassword").value;
+
     auth.createUserWithEmailAndPassword(email, password)
-      .then(cred => db.collection("users").doc(cred.user.uid).set({ name, age, email }))
-      .then(() => authMessage.innerText = "✅ Pendaftaran berjaya!")
-      .catch(err => authMessage.innerText = `❌ ${err.message}`);
+      .then(() => {
+        document.getElementById("authMessage").innerText = "✅ Pendaftaran berjaya!";
+      })
+      .catch(err => document.getElementById("authMessage").innerText = `❌ ${err.message}`);
   }
 
   function login() {
-    auth.signInWithEmailAndPassword(loginEmail.value, loginPassword.value)
+    const email = document.getElementById("loginEmail").value;
+    const password = document.getElementById("loginPassword").value;
+
+    auth.signInWithEmailAndPassword(email, password)
       .then(() => {
-        authSection.style.display = "none";
-        mainContent.style.display = "block";
+        document.getElementById("authSection").style.display = "none";
+        document.getElementById("mainContent").style.display = "block";
       })
-      .catch(err => authMessage.innerText = `❌ ${err.message}`);
+      .catch(err => document.getElementById("authMessage").innerText = `❌ ${err.message}`);
   }
 
   function logout() {
     auth.signOut().then(() => {
-      authSection.style.display = "block";
-      mainContent.style.display = "none";
+      document.getElementById("authSection").style.display = "block";
+      document.getElementById("mainContent").style.display = "none";
     });
   }
 
-  function toggleDarkMode() {
-    document.body.classList.toggle("dark-mode");
+  function startQuiz() {
+    const questionDiv = document.getElementById("question");
+    const optionsDiv = document.getElementById("quiz-options");
+    const resultDiv = document.getElementById("quiz-result");
+
+    const questions = [
+      { question: "Apakah itu Arduino?", options: ["Robot", "Sensor", "Mikropengawal", "Perisian"], answer: "Mikropengawal" },
+      { question: "Arduino UNO menggunakan cip apa?", options: ["ATmega328P", "ESP32", "PIC16F877A", "ARM Cortex"], answer: "ATmega328P" }
+    ];
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+
+    function showQuestion() {
+      if (currentQuestionIndex < questions.length) {
+        const q = questions[currentQuestionIndex];
+        questionDiv.innerText = q.question;
+        optionsDiv.innerHTML = "";
+        q.options.forEach(opt => {
+          const btn = document.createElement("button");
+          btn.className = "btn";
+          btn.innerText = opt;
+          btn.onclick = () => checkAnswer(opt);
+          optionsDiv.appendChild(btn);
+        });
+      } else {
+        resultDiv.innerHTML = `✅ Tamat! Skor anda: ${score}/${questions.length}`;
+      }
+    }
+
+    function checkAnswer(selected) {
+      if (selected === questions[currentQuestionIndex].answer) {
+        score++;
+        document.getElementById("correctSound").play();
+      } else {
+        document.getElementById("wrongSound").play();
+      }
+      currentQuestionIndex++;
+      showQuestion();
+    }
+
+    showQuestion();
   }
 </script>
 
