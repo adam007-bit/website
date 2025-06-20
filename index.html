@@ -1,57 +1,68 @@
 <!DOCTYPE html>
 <html lang="ms">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Arduino Learning Portal</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
       padding: 30px;
-      background: #f0f4f8;
+      background-color: #f4f6f9;
       color: #333;
       display: flex;
       flex-direction: column;
       align-items: center;
       transition: background 0.3s, color 0.3s;
     }
-    .form-group, .section {
-      margin-bottom: 20px;
-      width: 80%;
-    }
-    .btn {
-      margin: 5px;
-      padding: 10px 15px;
-      background: #007bff;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .btn:hover {
-      background: #0056b3;
-    }
     .card {
-      background: white;
-      padding: 20px;
-      border-radius: 15px;
-      box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
-      margin-bottom: 20px;
-      text-align: center;
+      background-color: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      margin: 20px 0;
       width: 100%;
       max-width: 600px;
+      text-align: center;
     }
-    #mainContent {
-      display: none;
+    input {
+      padding: 10px;
+      margin: 8px 0;
       width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    .btn {
+      background-color: #007bff;
+      border: none;
+      color: white;
+      padding: 10px 18px;
+      margin: 10px 5px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background-color 0.2s ease-in-out;
+    }
+    .btn:hover {
+      background-color: #0056b3;
+    }
+    .form-group {
+      margin-bottom: 15px;
+      text-align: left;
     }
     .dark-mode {
-      background-color: #121212;
-      color: #e0e0e0;
+      background-color: #1e1e1e;
+      color: #f0f0f0;
     }
     .dark-mode .card {
-      background-color: #1e1e1e;
+      background-color: #2c2c2c;
       color: white;
+    }
+    progress {
+      width: 100%;
+      height: 20px;
+      margin-top: 10px;
     }
   </style>
 
@@ -62,15 +73,14 @@
 
   <!-- Firebase Config -->
   <script>
-   const firebaseConfig = {
-  apiKey: "AIzaSyD02BBBqbetJ2MV6tl2WBysXyIWXKGB7xI",
-  authDomain: "arduino-registrations.firebaseapp.com",
-  projectId: "arduino-registrations",
-  storageBucket: "arduino-registrations.firebasestorage.app",
-  messagingSenderId: "628252066469",
-  appId: "1:628252066469:web:8c1a0dd33d71c9fa6c834c"
-};
-    // Initialize Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyD02BBBqbetJ2MV6tl2WBysXyIWXKGB7xI",
+      authDomain: "arduino-registrations.firebaseapp.com",
+      projectId: "arduino-registrations",
+      storageBucket: "arduino-registrations.firebasestorage.app",
+      messagingSenderId: "628252066469",
+      appId: "1:628252066469:web:8c1a0dd33d71c9fa6c834c"
+    };
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
@@ -81,121 +91,8 @@
 <audio id="correctSound" src="https://www.soundjay.com/button/beep-07.wav" preload="auto"></audio>
 <audio id="wrongSound" src="https://www.soundjay.com/button/beep-10.wav" preload="auto"></audio>
 
-<div id="authSection">
+<div id="authSection" class="card">
   <h2>🔐 Log Masuk</h2>
-  <div class="form-group">
-    <input type="email" id="loginEmail" placeholder="Email" required>
-  </div>
-  <div class="form-group">
-    <input type="password" id="loginPassword" placeholder="Kata Laluan" required>
-  </div>
-  <button class="btn" onclick="login()">Log Masuk</button>
-  
-  <h3>📌 Belum ada akaun? Daftar di sini:</h3>
-  <div class="form-group">
-    <input type="text" id="registerName" placeholder="Nama Penuh" required>
-  </div>
-  <div class="form-group">
-    <input type="email" id="registerEmail" placeholder="Email" required>
-  </div>
-  <div class="form-group">
-    <input type="password" id="registerPassword" placeholder="Kata Laluan" required>
-  </div>
-  <button class="btn" onclick="register()">Daftar</button>
-  <p id="authMessage"></p>
-</div>
+  <div class="form-group"><input type="email" id="loginEmail" placeholder="Email" /></div>
+  <div cl
 
-<div id="mainContent">
-  <div class="card">
-    <h1>Selamat Datang</h1>
-    <button class="btn" onclick="logout()">Log Keluar</button>
-  </div>
-
-  <div class="card">
-    <h2>🎯 Kuiz Arduino</h2>
-    <button class="btn" onclick="startQuiz()">Mula Kuiz</button>
-    <div id="question"></div>
-    <div id="quiz-options"></div>
-    <div id="quiz-result"></div>
-  </div>
-</div>
-
-<script>
-  function register() {
-    const name = document.getElementById("registerName").value;
-    const email = document.getElementById("registerEmail").value;
-    const password = document.getElementById("registerPassword").value;
-
-    auth.createUserWithEmailAndPassword(email, password)
-      .then(() => {
-        document.getElementById("authMessage").innerText = "✅ Pendaftaran berjaya!";
-      })
-      .catch(err => document.getElementById("authMessage").innerText = `❌ ${err.message}`);
-  }
-
-  function login() {
-    const email = document.getElementById("loginEmail").value;
-    const password = document.getElementById("loginPassword").value;
-
-    auth.signInWithEmailAndPassword(email, password)
-      .then(() => {
-        document.getElementById("authSection").style.display = "none";
-        document.getElementById("mainContent").style.display = "block";
-      })
-      .catch(err => document.getElementById("authMessage").innerText = `❌ ${err.message}`);
-  }
-
-  function logout() {
-    auth.signOut().then(() => {
-      document.getElementById("authSection").style.display = "block";
-      document.getElementById("mainContent").style.display = "none";
-    });
-  }
-
-  function startQuiz() {
-    const questionDiv = document.getElementById("question");
-    const optionsDiv = document.getElementById("quiz-options");
-    const resultDiv = document.getElementById("quiz-result");
-
-    const questions = [
-      { question: "Apakah itu Arduino?", options: ["Robot", "Sensor", "Mikropengawal", "Perisian"], answer: "Mikropengawal" },
-      { question: "Arduino UNO menggunakan cip apa?", options: ["ATmega328P", "ESP32", "PIC16F877A", "ARM Cortex"], answer: "ATmega328P" }
-    ];
-
-    let currentQuestionIndex = 0;
-    let score = 0;
-
-    function showQuestion() {
-      if (currentQuestionIndex < questions.length) {
-        const q = questions[currentQuestionIndex];
-        questionDiv.innerText = q.question;
-        optionsDiv.innerHTML = "";
-        q.options.forEach(opt => {
-          const btn = document.createElement("button");
-          btn.className = "btn";
-          btn.innerText = opt;
-          btn.onclick = () => checkAnswer(opt);
-          optionsDiv.appendChild(btn);
-        });
-      } else {
-        resultDiv.innerHTML = `✅ Tamat! Skor anda: ${score}/${questions.length}`;
-      }
-    }
-
-    function checkAnswer(selected) {
-      if (selected === questions[currentQuestionIndex].answer) {
-        score++;
-        document.getElementById("correctSound").play();
-      } else {
-        document.getElementById("wrongSound").play();
-      }
-      currentQuestionIndex++;
-      showQuestion();
-    }
-
-    showQuestion();
-  }
-</script>
-
-</body>
-</html>
