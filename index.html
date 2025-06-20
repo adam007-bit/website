@@ -64,6 +64,15 @@
       height: 20px;
       margin-top: 10px;
     }
+    a {
+      text-decoration: none;
+      color: #007bff;
+      font-weight: 500;
+    }
+    a:hover {
+      color: #0056b3;
+      text-decoration: underline;
+    }
   </style>
 
   <!-- Firebase SDKs -->
@@ -106,13 +115,12 @@
 
 <!-- Main Content After Login -->
 <div id="mainContent" style="display:none;">
-
   <div class="card">
     <h1 id="welcomeUser">Selamat Datang</h1>
     <p style="font-weight: bold; font-family: 'Courier New', Courier, monospace;">
       Portal Pembelajaran Arduino ini direka khas untuk membantu pelajar sekolah memahami asas mikropengawal dan elektronik secara interaktif melalui kuiz, modul dan aktiviti yang menarik.
     </p>
-    <button class="btn" onclick="toggleDarkMode()">🌗 Tukar Tema</button>
+    <button class="btn" onclick="toggleDarkMode()">🌗 </button>
     <button class="btn" onclick="logout()">Log Keluar</button>
   </div>
 
@@ -137,13 +145,12 @@
 
     <h3>Perkhidmatan Latihan</h3>
     <ul style="text-align: left;">
-      <li>🚗 Kereta Kawalan Arduino</li>
-      <li>🛠️ Bengkel Arduino</li>
-      <li>🏫 Projek Arduino Sekolah</li>
-      <li>💻 Latihan Kejuruteraan Perisian</li>
+      <li><a href="https://example.com/kereta-arduino" target="_blank">🚗 Kereta Kawalan Arduino</a></li>
+      <li><a href="https://example.com/bengkel-arduino" target="_blank">🛠️ Bengkel Arduino</a></li>
+      <li><a href="https://example.com/projek-sekolah" target="_blank">🏫 Projek Arduino Sekolah</a></li>
+      <li><a href="https://example.com/latihan-perisian" target="_blank">💻 Latihan Kejuruteraan Perisian</a></li>
     </ul>
   </div>
-
 </div>
 
 <script>
@@ -205,8 +212,46 @@
     const progressBar = document.getElementById("quizProgress");
 
     const questions = [
-      { question: "Apakah itu Arduino?", options: ["Robot", "Sensor", "Mikropengawal", "Perisian"], answer: "Mikropengawal" },
-      { question: "Arduino UNO menggunakan cip apa?", options: ["ATmega328P", "ESP32", "PIC16F877A", "ARM Cortex"], answer: "ATmega328P" }
+      {
+        question: "Apakah itu Arduino?",
+        options: ["Robot", "Sensor", "Mikropengawal", "Perisian"],
+        answer: "Mikropengawal"
+      },
+      {
+        question: "Arduino UNO menggunakan cip apa?",
+        options: ["ATmega328P", "ESP32", "PIC16F877A", "ARM Cortex"],
+        answer: "ATmega328P"
+      },
+      {
+        question: "Apakah nama perisian rasmi untuk menulis kod Arduino?",
+        options: ["Arduino Studio", "Arduino IDE", "CodeBlocks", "AVR Editor"],
+        answer: "Arduino IDE"
+      },
+      {
+        question: "Pin manakah digunakan untuk input analog pada Arduino UNO?",
+        options: ["A0 - A5", "D0 - D13", "TX/RX", "VIN"],
+        answer: "A0 - A5"
+      },
+      {
+        question: "Fungsi 'delay(1000)' dalam kod Arduino akan menyebabkan?",
+        options: [
+          "Hentian selama 1 saat",
+          "Pin dimatikan",
+          "Sensor diaktifkan",
+          "Data dihantar ke serial"
+        ],
+        answer: "Hentian selama 1 saat"
+      },
+      {
+        question: "Apakah maksud LED menyala berkelip pada Arduino?",
+        options: [
+          "Kod berjaya dimuat naik dan berjalan",
+          "Arduino rosak",
+          "Kabel putus",
+          "Pin analog aktif"
+        ],
+        answer: "Kod berjaya dimuat naik dan berjalan"
+      }
     ];
 
     let current = 0, score = 0;
