@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Arduino Learning Portal</title>
+  <title>Portal Pembelajaran Arduino</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -88,6 +88,7 @@
 </head>
 <body>
 
+<!-- Login/Register Section -->
 <div id="authSection" class="card">
   <h2>🔐 Log Masuk</h2>
   <div class="form-group"><input type="email" id="loginEmail" placeholder="Email" /></div>
@@ -103,10 +104,15 @@
   <p id="authMessage"></p>
 </div>
 
+<!-- Main Content After Login -->
 <div id="mainContent" style="display:none;">
+
   <div class="card">
     <h1 id="welcomeUser">Selamat Datang</h1>
-    <button class="btn" onclick="toggleDarkMode()">🌗</button>
+    <p style="font-weight: bold; font-family: 'Courier New', Courier, monospace;">
+      Portal Pembelajaran Arduino ini direka khas untuk membantu pelajar sekolah memahami asas mikropengawal dan elektronik secara interaktif melalui kuiz, modul dan aktiviti yang menarik.
+    </p>
+    <button class="btn" onclick="toggleDarkMode()">🌗 Tukar Tema</button>
     <button class="btn" onclick="logout()">Log Keluar</button>
   </div>
 
@@ -118,6 +124,26 @@
     <progress id="quizProgress" value="0" max="100"></progress>
     <div id="quiz-result" style="margin-top: 10px; font-weight: bold;"></div>
   </div>
+
+  <div class="card">
+    <h2>🏆 Cabaran Inovasi</h2>
+    <h3>Tentang Kami</h3>
+    <p>
+      Kami bersemangat dalam bidang teknologi dan pendidikan, menawarkan pengalaman pembelajaran secara praktikal melalui projek Arduino dan latihan kejuruteraan perisian.
+    </p>
+    <p>
+      Misi kami adalah untuk merapatkan jurang antara inovasi dan pembelajaran, serta memperkasakan individu untuk membina penyelesaian yang kreatif dan praktikal.
+    </p>
+
+    <h3>Perkhidmatan Latihan</h3>
+    <ul style="text-align: left;">
+      <li>🚗 Kereta Kawalan Arduino</li>
+      <li>🛠️ Bengkel Arduino</li>
+      <li>🏫 Projek Arduino Sekolah</li>
+      <li>💻 Latihan Kejuruteraan Perisian</li>
+    </ul>
+  </div>
+
 </div>
 
 <script>
@@ -131,9 +157,7 @@
     const password = document.getElementById("registerPassword").value;
 
     auth.createUserWithEmailAndPassword(email, password)
-      .then(cred => {
-        return db.collection("users").doc(cred.user.uid).set({ name, email });
-      })
+      .then(cred => db.collection("users").doc(cred.user.uid).set({ name, email }))
       .then(() => {
         document.getElementById("authMessage").innerText = "✅ Pendaftaran berjaya!";
       })
@@ -237,4 +261,3 @@
 </script>
 </body>
 </html>
-
