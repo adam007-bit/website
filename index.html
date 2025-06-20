@@ -62,15 +62,14 @@
 
   <!-- Firebase Config -->
   <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyD02BBBqbetJ2MV6tl2WBysXyIWXKGB7xI",
-      authDomain: "arduino-registrations.firebaseapp.com",
-      projectId: "arduino-registrations",
-      storageBucket: "arduino-registrations.appspot.com",
-      messagingSenderId: "628252066469",
-      appId: "1:628252066469:web:8c1a0dd33d71c9fa6c834c"
-    };
-
+   const firebaseConfig = {
+  apiKey: "AIzaSyD02BBBqbetJ2MV6tl2WBysXyIWXKGB7xI",
+  authDomain: "arduino-registrations.firebaseapp.com",
+  projectId: "arduino-registrations",
+  storageBucket: "arduino-registrations.firebasestorage.app",
+  messagingSenderId: "628252066469",
+  appId: "1:628252066469:web:8c1a0dd33d71c9fa6c834c"
+};
     // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
