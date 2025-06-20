@@ -6,7 +6,7 @@
   <title>Arduino Learning Portal</title>
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Segoe UI', sans-serif;
       margin: 0;
       padding: 30px;
       background-color: #f4f6f9;
@@ -88,11 +88,153 @@
 </head>
 <body>
 
-<audio id="correctSound" src="https://www.soundjay.com/button/beep-07.wav" preload="auto"></audio>
-<audio id="wrongSound" src="https://www.soundjay.com/button/beep-10.wav" preload="auto"></audio>
-
 <div id="authSection" class="card">
   <h2>🔐 Log Masuk</h2>
   <div class="form-group"><input type="email" id="loginEmail" placeholder="Email" /></div>
-  <div cl
+  <div class="form-group"><input type="password" id="loginPassword" placeholder="Kata Laluan" /></div>
+  <button class="btn" onclick="login()">Log Masuk</button>
+
+  <h3>📌 Daftar Akaun Baharu</h3>
+  <div class="form-group"><input type="text" id="registerName" placeholder="Nama Penuh" /></div>
+  <div class="form-group"><input type="email" id="registerEmail" placeholder="Email" /></div>
+  <div class="form-group"><input type="password" id="registerPassword" placeholder="Kata Laluan" /></div>
+  <button class="btn" onclick="register()">Daftar</button>
+
+  <p id="authMessage"></p>
+</div>
+
+<div id="mainContent" style="display:none;">
+  <div class="card">
+    <h1 id="welcomeUser">Selamat Datang</h1>
+    <button class="btn" onclick="toggleDarkMode()">🌗 Tukar Tema</button>
+    <button class="btn" onclick="logout()">Log Keluar</button>
+  </div>
+
+  <div class="card">
+    <h2>🎯 Kuiz Arduino</h2>
+    <button class="btn" onclick="startQuiz()">Mula Kuiz</button>
+    <div id="question" style="margin-top: 15px;"></div>
+    <div id="quiz-options"></div>
+    <progress id="quizProgress" value="0" max="100"></progress>
+    <div id="quiz-result" style="margin-top: 10px; font-weight: bold;"></div>
+  </div>
+</div>
+
+<script>
+  function toggleDarkMode() {
+    document.body.classList.toggle("dark-mode");
+  }
+
+  function register() {
+    const name = document.getElementById("registerName").value;
+    const email = document.getElementById("registerEmail").value;
+    const password = document.getElementById("registerPassword").value;
+
+    auth.createUserWithEmailAndPassword(email, password)
+      .then(cred => {
+        return db.collection("users").doc(cred.user.uid).set({ name, email });
+      })
+      .then(() => {
+        document.getElementById("authMessage").innerText = "✅ Pendaftaran berjaya!";
+      })
+      .catch(err => {
+        document.getElementById("authMessage").innerText = `❌ ${err.message}`;
+      });
+  }
+
+  function login() {
+    const email = document.getElementById("loginEmail").value;
+    const password = document.getElementById("loginPassword").value;
+
+    auth.signInWithEmailAndPassword(email, password)
+      .then(() => {
+        document.getElementById("authSection").style.display = "none";
+        document.getElementById("mainContent").style.display = "block";
+      })
+      .catch(err => {
+        document.getElementById("authMessage").innerText = `❌ ${err.message}`;
+      });
+  }
+
+  function logout() {
+    auth.signOut().then(() => {
+      document.getElementById("mainContent").style.display = "none";
+      document.getElementById("authSection").style.display = "block";
+    });
+  }
+
+  auth.onAuthStateChanged(user => {
+    if (user) {
+      db.collection("users").doc(user.uid).get().then(doc => {
+        const name = doc.exists ? doc.data().name : "Pengguna";
+        document.getElementById("welcomeUser").innerText = `Selamat Datang, ${name}`;
+        document.getElementById("authSection").style.display = "none";
+        document.getElementById("mainContent").style.display = "block";
+      });
+    }
+  });
+
+  function startQuiz() {
+    const questionDiv = document.getElementById("question");
+    const optionsDiv = document.getElementById("quiz-options");
+    const resultDiv = document.getElementById("quiz-result");
+    const progressBar = document.getElementById("quizProgress");
+
+    const questions = [
+      { question: "Apakah itu Arduino?", options: ["Robot", "Sensor", "Mikropengawal", "Perisian"], answer: "Mikropengawal" },
+      { question: "Arduino UNO menggunakan cip apa?", options: ["ATmega328P", "ESP32", "PIC16F877A", "ARM Cortex"], answer: "ATmega328P" }
+    ];
+
+    let current = 0, score = 0;
+
+    function showQuestion() {
+      if (current < questions.length) {
+        const q = questions[current];
+        questionDiv.innerText = q.question;
+        optionsDiv.innerHTML = "";
+        resultDiv.innerText = "";
+        q.options.forEach(opt => {
+          const btn = document.createElement("button");
+          btn.className = "btn";
+          btn.innerText = opt;
+          btn.onclick = () => checkAnswer(opt);
+          optionsDiv.appendChild(btn);
+        });
+        progressBar.value = (current / questions.length) * 100;
+      } else {
+        resultDiv.innerHTML = `✅ Tamat! Skor anda: ${score}/${questions.length}`;
+        progressBar.value = 100;
+        saveScore(score);
+      }
+    }
+
+    function checkAnswer(selected) {
+      const correct = questions[current].answer;
+      if (selected === correct) {
+        score++;
+        resultDiv.innerText = "✅ Betul!";
+      } else {
+        resultDiv.innerText = `❌ Salah. Jawapan betul: ${correct}`;
+      }
+      current++;
+      setTimeout(showQuestion, 1000);
+    }
+
+    function saveScore(score) {
+      const user = auth.currentUser;
+      if (user) {
+        db.collection("scores").add({
+          uid: user.uid,
+          email: user.email,
+          score: score,
+          timestamp: new Date()
+        });
+      }
+    }
+
+    showQuestion();
+  }
+</script>
+</body>
+</html>
 
