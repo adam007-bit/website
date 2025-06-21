@@ -25,13 +25,6 @@
       max-width: 600px;
       text-align: center;
     }
-    input {
-      padding: 10px;
-      margin: 8px 0;
-      width: 100%;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-    }
     .btn {
       background-color: #007bff;
       border: none;
@@ -42,182 +35,53 @@
       cursor: pointer;
       font-weight: 600;
     }
-    .btn:hover {
-      background-color: #0056b3;
+    .btn:hover { background-color: #0056b3; }
+    .timer-bar {
+      height: 10px;
+      background-color: #28a745;
+      transition: width 1s linear;
     }
-    .form-group {
-      margin-bottom: 15px;
-      text-align: left;
-    }
-    .dark-mode {
-      background-color: #1e1e1e;
-      color: #f0f0f0;
-    }
-    .dark-mode .card {
-      background-color: #2c2c2c;
-      color: white;
-    }
-    progress {
+    #timer-container {
       width: 100%;
-      height: 20px;
+      background-color: #e9ecef;
+      border-radius: 5px;
+      overflow: hidden;
+      margin: 10px 0;
+    }
+    .badge {
+      font-size: 24px;
       margin-top: 10px;
     }
-    a {
-      text-decoration: none;
-      color: #007bff;
-      font-weight: 500;
-    }
-    a:hover {
-      color: #0056b3;
-      text-decoration: underline;
-    }
   </style>
-
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyD02BBBqbetJ2MV6tl2WBysXyIWXKGB7xI",
-      authDomain: "arduino-registrations.firebaseapp.com",
-      projectId: "arduino-registrations",
-      storageBucket: "arduino-registrations.firebasestorage.app",
-      messagingSenderId: "628252066469",
-      appId: "1:628252066469:web:8c1a0dd33d71c9fa6c834c"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-  </script>
 </head>
 <body>
 
-<!-- Login/Register Section -->
-<div id="authSection" class="card">
-  <h2>🔐 Log Masuk</h2>
-  <div class="form-group"><input type="email" id="loginEmail" placeholder="Email" /></div>
-  <div class="form-group"><input type="password" id="loginPassword" placeholder="Kata Laluan" /></div>
-  <button class="btn" onclick="login()">Log Masuk</button>
+<div class="card">
+  <h2>🎯 Kuiz Arduino</h2>
+  <button class="btn" onclick="startQuiz()">Mula Kuiz</button>
+  <div id="question" style="margin-top: 15px;"></div>
+  <div id="quiz-options"></div>
 
-  <hr />
-
-  <button class="btn" onclick="toggleRegister()">Daftar Akaun Baharu</button>
-
-  <div id="registerSection" style="display:none; margin-top: 20px;">
-    <h3>📌 Pendaftaran</h3>
-    <div class="form-group"><input type="text" id="registerName" placeholder="Nama Penuh" /></div>
-    <div class="form-group"><input type="email" id="registerEmail" placeholder="Email" /></div>
-    <div class="form-group"><input type="password" id="registerPassword" placeholder="Kata Laluan" /></div>
-    <button class="btn" onclick="register()">Daftar</button>
+  <div id="timer-container" style="display:none;">
+    <div id="timer-bar" class="timer-bar" style="width: 100%;"></div>
   </div>
+  <div id="time-remaining"></div>
 
-  <p id="authMessage"></p>
-</div>
-
-<!-- Main Content -->
-<div id="mainContent" style="display:none;">
-  <div class="card">
-    <h1 id="welcomeUser">Selamat Datang</h1>
-    <p style="font-weight: bold; font-family: 'Courier New', Courier, monospace;">
-      Portal Pembelajaran Arduino ini direka khas untuk membantu pelajar sekolah memahami asas mikropengawal dan elektronik secara interaktif melalui kuiz, modul dan aktiviti yang menarik.
-    </p>
-    <button class="btn" onclick="toggleDarkMode()">🌗 </button>
-    <button class="btn" onclick="logout()">Log Keluar</button>
-  </div>
-
-  <div class="card">
-    <h2>🎯 Kuiz Arduino</h2>
-    <button class="btn" onclick="startQuiz()">Mula Kuiz</button>
-    <div id="question" style="margin-top: 15px;"></div>
-    <div id="quiz-options"></div>
-    <progress id="quizProgress" value="0" max="100"></progress>
-    <div id="quiz-result" style="margin-top: 10px; font-weight: bold;"></div>
-  </div>
-
-  <div class="card">
-    <h2>🏆 Cabaran Inovasi</h2>
-    <h3>Tentang Kami</h3>
-    <p>
-      Kami bersemangat dalam bidang teknologi dan pendidikan, menawarkan pengalaman pembelajaran secara praktikal melalui projek Arduino dan latihan kejuruteraan perisian.
-    </p>
-    <p>
-      Misi kami adalah untuk merapatkan jurang antara inovasi dan pembelajaran, serta memperkasakan individu untuk membina penyelesaian yang kreatif dan praktikal.
-    </p>
-
-    <h3>Perkhidmatan Latihan</h3>
-    <ul style="text-align: left;">
-      <li><a href="https://example.com/kereta-arduino" target="_blank">🚗 Kereta Kawalan Arduino</a></li>
-      <li><a href="https://example.com/bengkel-arduino" target="_blank">🛠️ Bengkel Arduino</a></li>
-      <li><a href="https://example.com/projek-sekolah" target="_blank">🏫 Projek Arduino Sekolah</a></li>
-      <li><a href="https://example.com/latihan-perisian" target="_blank">💻 Latihan Kejuruteraan Perisian</a></li>
-    </ul>
-  </div>
+  <progress id="quizProgress" value="0" max="100"></progress>
+  <div id="quiz-result" style="margin-top: 10px; font-weight: bold;"></div>
+  <div id="quiz-badge" class="badge"></div>
 </div>
 
 <script>
-  function toggleDarkMode() {
-    document.body.classList.toggle("dark-mode");
-  }
-
-  function toggleRegister() {
-    const reg = document.getElementById("registerSection");
-    reg.style.display = reg.style.display === "none" ? "block" : "none";
-  }
-
-  function register() {
-    const name = document.getElementById("registerName").value;
-    const email = document.getElementById("registerEmail").value;
-    const password = document.getElementById("registerPassword").value;
-
-    auth.createUserWithEmailAndPassword(email, password)
-      .then(cred => db.collection("users").doc(cred.user.uid).set({ name, email }))
-      .then(() => {
-        document.getElementById("authMessage").innerText = "✅ Pendaftaran berjaya!";
-      })
-      .catch(err => {
-        document.getElementById("authMessage").innerText = `❌ ${err.message}`;
-      });
-  }
-
-  function login() {
-    const email = document.getElementById("loginEmail").value;
-    const password = document.getElementById("loginPassword").value;
-
-    auth.signInWithEmailAndPassword(email, password)
-      .then(() => {
-        document.getElementById("authSection").style.display = "none";
-        document.getElementById("mainContent").style.display = "block";
-      })
-      .catch(err => {
-        document.getElementById("authMessage").innerText = `❌ ${err.message}`;
-      });
-  }
-
-  function logout() {
-    auth.signOut().then(() => {
-      document.getElementById("mainContent").style.display = "none";
-      document.getElementById("authSection").style.display = "block";
-    });
-  }
-
-  auth.onAuthStateChanged(user => {
-    if (user) {
-      db.collection("users").doc(user.uid).get().then(doc => {
-        const name = doc.exists ? doc.data().name : "Pengguna";
-        document.getElementById("welcomeUser").innerText = `Selamat Datang, ${name}`;
-        document.getElementById("authSection").style.display = "none";
-        document.getElementById("mainContent").style.display = "block";
-      });
-    }
-  });
-
   function startQuiz() {
     const questionDiv = document.getElementById("question");
     const optionsDiv = document.getElementById("quiz-options");
     const resultDiv = document.getElementById("quiz-result");
     const progressBar = document.getElementById("quizProgress");
+    const badgeDiv = document.getElementById("quiz-badge");
+    const timerBar = document.getElementById("timer-bar");
+    const timerContainer = document.getElementById("timer-container");
+    const timeRemainingText = document.getElementById("time-remaining");
 
     const questions = [
       { question: "Apakah itu Arduino?", options: ["Robot", "Sensor", "Mikropengawal", "Perisian"], answer: "Mikropengawal" },
@@ -228,36 +92,46 @@
       { question: "Apakah maksud LED menyala berkelip pada Arduino?", options: ["Kod berjaya dimuat naik dan berjalan", "Arduino rosak", "Kabel putus", "Pin analog aktif"], answer: "Kod berjaya dimuat naik dan berjalan" }
     ];
 
-    let current = 0, score = 0;
+    let current = 0, score = 0, timer, timeLeft = 10;
 
     function showQuestion() {
-      if (current < questions.length) {
-        const q = questions[current];
-        questionDiv.innerText = q.question;
-        optionsDiv.innerHTML = "";
-        resultDiv.innerText = "";
-        q.options.forEach(opt => {
-          const btn = document.createElement("button");
-          btn.className = "btn";
-          btn.innerText = opt;
-          btn.onclick = () => checkAnswer(opt);
-          optionsDiv.appendChild(btn);
-        });
-        progressBar.value = (current / questions.length) * 100;
-      } else {
-        resultDiv.innerHTML = `✅ Tamat! Skor anda: ${score}/${questions.length}`;
-        progressBar.value = 100;
-        saveScore(score);
-        optionsDiv.innerHTML = "";
-        const restartBtn = document.createElement("button");
-        restartBtn.className = "btn";
-        restartBtn.innerText = "🔁 Ulang Kuiz";
-        restartBtn.onclick = startQuiz;
-        optionsDiv.appendChild(restartBtn);
-      }
+      clearInterval(timer);
+      timeLeft = 10;
+      timeRemainingText.innerText = "Masa tinggal: 10s";
+      timerContainer.style.display = "block";
+      timerBar.style.width = "100%";
+
+      const q = questions[current];
+      questionDiv.innerText = q.question;
+      optionsDiv.innerHTML = "";
+      resultDiv.innerText = "";
+      badgeDiv.innerText = "";
+
+      q.options.forEach(opt => {
+        const btn = document.createElement("button");
+        btn.className = "btn";
+        btn.innerText = opt;
+        btn.onclick = () => answerSelected(opt);
+        optionsDiv.appendChild(btn);
+      });
+
+      timer = setInterval(() => {
+        timeLeft--;
+        timeRemainingText.innerText = `Masa tinggal: ${timeLeft}s`;
+        timerBar.style.width = `${(timeLeft / 10) * 100}%`;
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          resultDiv.innerText = `⏰ Masa tamat! Jawapan betul: ${q.answer}`;
+          current++;
+          setTimeout(loadNext, 1000);
+        }
+      }, 1000);
+
+      progressBar.value = (current / questions.length) * 100;
     }
 
-    function checkAnswer(selected) {
+    function answerSelected(selected) {
+      clearInterval(timer);
       const correct = questions[current].answer;
       if (selected === correct) {
         score++;
@@ -266,25 +140,41 @@
         resultDiv.innerText = `❌ Salah. Jawapan betul: ${correct}`;
       }
       current++;
-      setTimeout(showQuestion, 1000);
+      setTimeout(loadNext, 1000);
     }
 
-    function saveScore(score) {
-      const user = auth.currentUser;
-      if (user) {
-        db.collection("scores").add({
-          uid: user.uid,
-          email: user.email,
-          score: score,
-          timestamp: new Date()
-        });
+    function loadNext() {
+      if (current < questions.length) {
+        showQuestion();
+      } else {
+        showResult();
       }
+    }
+
+    function showResult() {
+      resultDiv.innerText = `✅ Tamat! Skor anda: ${score}/${questions.length}`;
+      timerContainer.style.display = "none";
+      timeRemainingText.innerText = "";
+      progressBar.value = 100;
+      optionsDiv.innerHTML = "";
+
+      const restartBtn = document.createElement("button");
+      restartBtn.className = "btn";
+      restartBtn.innerText = "🔁 Ulang Kuiz";
+      restartBtn.onclick = startQuiz;
+      optionsDiv.appendChild(restartBtn);
+
+      // Papar lencana
+      if (score === questions.length) badgeDiv.innerText = "🥇 Lencana Emas";
+      else if (score >= 4) badgeDiv.innerText = "🥈 Lencana Perak";
+      else if (score >= 2) badgeDiv.innerText = "🥉 Lencana Gangsa";
+      else badgeDiv.innerText = "❌ Tiada lencana. Cuba lagi!";
     }
 
     showQuestion();
   }
 </script>
-
 </body>
 </html>
+
 
