@@ -71,53 +71,27 @@
       color: #0056b3;
       text-decoration: underline;
     }
-    #registerForm {
-      display: none;
-    }
-    #timer {
-      font-size: 18px;
-      margin: 10px 0;
-      color: #d9534f;
-      font-weight: bold;
-    }
   </style>
-
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyD02BBBqbetJ2MV6tl2WBysXyIWXKGB7xI",
-      authDomain: "arduino-registrations.firebaseapp.com",
-      projectId: "arduino-registrations",
-      storageBucket: "arduino-registrations.firebasestorage.app",
-      messagingSenderId: "628252066469",
-      appId: "1:628252066469:web:8c1a0dd33d71c9fa6c834c"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-  </script>
 </head>
 <body>
+
+<!-- Login/Register Section -->
 <div id="authSection" class="card">
   <h2>🔐 Log Masuk</h2>
   <div class="form-group"><input type="email" id="loginEmail" placeholder="Email" /></div>
   <div class="form-group"><input type="password" id="loginPassword" placeholder="Kata Laluan" /></div>
   <button class="btn" onclick="login()">Log Masuk</button>
 
-  <button class="btn" onclick="toggleRegister()">Daftar Akaun Baharu</button>
-  <div id="registerForm">
-    <div class="form-group"><input type="text" id="registerName" placeholder="Nama Penuh" /></div>
-    <div class="form-group"><input type="email" id="registerEmail" placeholder="Email" /></div>
-    <div class="form-group"><input type="password" id="registerPassword" placeholder="Kata Laluan" /></div>
-    <button class="btn" onclick="register()">Daftar</button>
-  </div>
+  <h3>📌 Daftar Akaun Baharu</h3>
+  <div class="form-group"><input type="text" id="registerName" placeholder="Nama Penuh" /></div>
+  <div class="form-group"><input type="email" id="registerEmail" placeholder="Email" /></div>
+  <div class="form-group"><input type="password" id="registerPassword" placeholder="Kata Laluan" /></div>
+  <button class="btn" onclick="register()">Daftar</button>
+
   <p id="authMessage"></p>
 </div>
 
+<!-- Main Content -->
 <div id="mainContent" style="display:none;">
   <div class="card">
     <h1 id="welcomeUser">Selamat Datang</h1>
@@ -131,7 +105,6 @@
   <div class="card">
     <h2>🎯 Kuiz Arduino</h2>
     <button class="btn" onclick="startQuiz()">Mula Kuiz</button>
-    <div id="timer"></div>
     <div id="question" style="margin-top: 15px;"></div>
     <div id="quiz-options"></div>
     <progress id="quizProgress" value="0" max="100"></progress>
@@ -141,163 +114,22 @@
   <div class="card">
     <h2>🏆 Cabaran Inovasi</h2>
     <h3>Tentang Kami</h3>
-    <p>...</p>
+    <p>
+      Kami bersemangat dalam bidang teknologi dan pendidikan, menawarkan pengalaman pembelajaran secara praktikal melalui projek Arduino dan latihan kejuruteraan perisian.
+    </p>
+    <p>
+      Misi kami adalah untuk merapatkan jurang antara inovasi dan pembelajaran, serta memperkasakan individu untuk membina penyelesaian yang kreatif dan praktikal.
+    </p>
+
+    <h3>Perkhidmatan Latihan</h3>
+    <ul style="text-align: left;">
+      <li><a href="https://example.com/kereta-arduino" target="_blank">🚗 Kereta Kawalan Arduino</a></li>
+      <li><a href="https://example.com/bengkel-arduino" target="_blank">🛠️ Bengkel Arduino</a></li>
+      <li><a href="https://example.com/projek-sekolah" target="_blank">🏫 Projek Arduino Sekolah</a></li>
+      <li><a href="https://example.com/latihan-perisian" target="_blank">💻 Latihan Kejuruteraan Perisian</a></li>
+    </ul>
   </div>
 </div>
 
-<script>
-function toggleDarkMode() {
-  document.body.classList.toggle("dark-mode");
-}
-
-function toggleRegister() {
-  const regForm = document.getElementById("registerForm");
-  regForm.style.display = regForm.style.display === "none" ? "block" : "none";
-}
-
-function register() {
-  const name = document.getElementById("registerName").value;
-  const email = document.getElementById("registerEmail").value;
-  const password = document.getElementById("registerPassword").value;
-
-  auth.createUserWithEmailAndPassword(email, password)
-    .then(cred => db.collection("users").doc(cred.user.uid).set({ name, email }))
-    .then(() => {
-      document.getElementById("authMessage").innerText = "✅ Pendaftaran berjaya!";
-    })
-    .catch(err => {
-      document.getElementById("authMessage").innerText = `❌ ${err.message}`;
-    });
-}
-
-function login() {
-  const email = document.getElementById("loginEmail").value;
-  const password = document.getElementById("loginPassword").value;
-
-  auth.signInWithEmailAndPassword(email, password)
-    .then(() => {
-      document.getElementById("authSection").style.display = "none";
-      document.getElementById("mainContent").style.display = "block";
-    })
-    .catch(err => {
-      document.getElementById("authMessage").innerText = `❌ ${err.message}`;
-    });
-}
-
-function logout() {
-  auth.signOut().then(() => {
-    document.getElementById("mainContent").style.display = "none";
-    document.getElementById("authSection").style.display = "block";
-  });
-}
-
-auth.onAuthStateChanged(user => {
-  if (user) {
-    db.collection("users").doc(user.uid).get().then(doc => {
-      const name = doc.exists ? doc.data().name : "Pengguna";
-      document.getElementById("welcomeUser").innerText = `Selamat Datang, ${name}`;
-      document.getElementById("authSection").style.display = "none";
-      document.getElementById("mainContent").style.display = "block";
-    });
-  }
-});
-
-function startQuiz() {
-  const questionDiv = document.getElementById("question");
-  const optionsDiv = document.getElementById("quiz-options");
-  const resultDiv = document.getElementById("quiz-result");
-  const progressBar = document.getElementById("quizProgress");
-  const timerDisplay = document.getElementById("timer");
-
-  const questions = [
-    { question: "Apakah itu Arduino?", options: ["Robot", "Sensor", "Mikropengawal", "Perisian"], answer: "Mikropengawal" },
-    { question: "Arduino UNO menggunakan cip apa?", options: ["ATmega328P", "ESP32", "PIC16F877A", "ARM Cortex"], answer: "ATmega328P" },
-    { question: "Apakah nama perisian rasmi untuk menulis kod Arduino?", options: ["Arduino Studio", "Arduino IDE", "CodeBlocks", "AVR Editor"], answer: "Arduino IDE" },
-    { question: "Pin manakah digunakan untuk input analog pada Arduino UNO?", options: ["A0 - A5", "D0 - D13", "TX/RX", "VIN"], answer: "A0 - A5" },
-    { question: "Fungsi 'delay(1000)' dalam kod Arduino akan menyebabkan?", options: ["Hentian selama 1 saat", "Pin dimatikan", "Sensor diaktifkan", "Data dihantar ke serial"], answer: "Hentian selama 1 saat" },
-    { question: "Apakah maksud LED menyala berkelip pada Arduino?", options: ["Kod berjaya dimuat naik dan berjalan", "Arduino rosak", "Kabel putus", "Pin analog aktif"], answer: "Kod berjaya dimuat naik dan berjalan" }
-  ];
-
-  let current = 0, score = 0, timer;
-
-  function showQuestion() {
-    if (current < questions.length) {
-      const q = questions[current];
-      questionDiv.innerText = q.question;
-      optionsDiv.innerHTML = "";
-      resultDiv.innerText = "";
-      timerDisplay.innerText = "Masa: 10 saat";
-      
-      q.options.forEach(opt => {
-        const btn = document.createElement("button");
-        btn.className = "btn";
-        btn.innerText = opt;
-        btn.onclick = () => {
-          clearInterval(timer);
-          checkAnswer(opt);
-        };
-        optionsDiv.appendChild(btn);
-      });
-
-      progressBar.value = (current / questions.length) * 100;
-
-      let timeLeft = 10;
-      timer = setInterval(() => {
-        timeLeft--;
-        timerDisplay.innerText = `Masa: ${timeLeft} saat`;
-        if (timeLeft <= 0) {
-          clearInterval(timer);
-          resultDiv.innerText = `❌ Masa tamat. Jawapan betul: ${q.answer}`;
-          current++;
-          setTimeout(showQuestion, 1500);
-        }
-      }, 1000);
-    } else {
-      progressBar.value = 100;
-      let badge = "";
-      if (score === questions.length) badge = "🥇 Lencana Emas";
-      else if (score >= 4) badge = "🥈 Lencana Perak";
-      else if (score >= 2) badge = "🥉 Lencana Gangsa";
-      else badge = "❌ Tiada Lencana";
-
-      resultDiv.innerHTML = `✅ Tamat! Skor anda: ${score}/${questions.length}<br>${badge}`;
-      optionsDiv.innerHTML = "";
-      const restartBtn = document.createElement("button");
-      restartBtn.className = "btn";
-      restartBtn.innerText = "🔁 Ulang Kuiz";
-      restartBtn.onclick = startQuiz;
-      optionsDiv.appendChild(restartBtn);
-
-      saveScore(score);
-    }
-  }
-
-  function checkAnswer(selected) {
-    const correct = questions[current].answer;
-    if (selected === correct) {
-      score++;
-      resultDiv.innerText = "✅ Betul!";
-    } else {
-      resultDiv.innerText = `❌ Salah. Jawapan betul: ${correct}`;
-    }
-    current++;
-    setTimeout(showQuestion, 1500);
-  }
-
-  function saveScore(score) {
-    const user = auth.currentUser;
-    if (user) {
-      db.collection("scores").add({
-        uid: user.uid,
-        email: user.email,
-        score: score,
-        timestamp: new Date()
-      });
-    }
-  }
-
-  showQuestion();
-}
-</script>
 </body>
 </html>
