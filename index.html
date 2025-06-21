@@ -14,7 +14,6 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      transition: background 0.3s, color 0.3s;
     }
     .card {
       background-color: white;
@@ -42,7 +41,6 @@
       border-radius: 6px;
       cursor: pointer;
       font-weight: 600;
-      transition: background-color 0.2s ease-in-out;
     }
     .btn:hover {
       background-color: #0056b3;
@@ -80,7 +78,6 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
-  <!-- Firebase Config -->
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyD02BBBqbetJ2MV6tl2WBysXyIWXKGB7xI",
@@ -113,7 +110,7 @@
   <p id="authMessage"></p>
 </div>
 
-<!-- Main Content After Login -->
+<!-- Main Content -->
 <div id="mainContent" style="display:none;">
   <div class="card">
     <h1 id="welcomeUser">Selamat Datang</h1>
@@ -212,46 +209,12 @@
     const progressBar = document.getElementById("quizProgress");
 
     const questions = [
-      {
-        question: "Apakah itu Arduino?",
-        options: ["Robot", "Sensor", "Mikropengawal", "Perisian"],
-        answer: "Mikropengawal"
-      },
-      {
-        question: "Arduino UNO menggunakan cip apa?",
-        options: ["ATmega328P", "ESP32", "PIC16F877A", "ARM Cortex"],
-        answer: "ATmega328P"
-      },
-      {
-        question: "Apakah nama perisian rasmi untuk menulis kod Arduino?",
-        options: ["Arduino Studio", "Arduino IDE", "CodeBlocks", "AVR Editor"],
-        answer: "Arduino IDE"
-      },
-      {
-        question: "Pin manakah digunakan untuk input analog pada Arduino UNO?",
-        options: ["A0 - A5", "D0 - D13", "TX/RX", "VIN"],
-        answer: "A0 - A5"
-      },
-      {
-        question: "Fungsi 'delay(1000)' dalam kod Arduino akan menyebabkan?",
-        options: [
-          "Hentian selama 1 saat",
-          "Pin dimatikan",
-          "Sensor diaktifkan",
-          "Data dihantar ke serial"
-        ],
-        answer: "Hentian selama 1 saat"
-      },
-      {
-        question: "Apakah maksud LED menyala berkelip pada Arduino?",
-        options: [
-          "Kod berjaya dimuat naik dan berjalan",
-          "Arduino rosak",
-          "Kabel putus",
-          "Pin analog aktif"
-        ],
-        answer: "Kod berjaya dimuat naik dan berjalan"
-      }
+      { question: "Apakah itu Arduino?", options: ["Robot", "Sensor", "Mikropengawal", "Perisian"], answer: "Mikropengawal" },
+      { question: "Arduino UNO menggunakan cip apa?", options: ["ATmega328P", "ESP32", "PIC16F877A", "ARM Cortex"], answer: "ATmega328P" },
+      { question: "Apakah nama perisian rasmi untuk menulis kod Arduino?", options: ["Arduino Studio", "Arduino IDE", "CodeBlocks", "AVR Editor"], answer: "Arduino IDE" },
+      { question: "Pin manakah digunakan untuk input analog pada Arduino UNO?", options: ["A0 - A5", "D0 - D13", "TX/RX", "VIN"], answer: "A0 - A5" },
+      { question: "Fungsi 'delay(1000)' dalam kod Arduino akan menyebabkan?", options: ["Hentian selama 1 saat", "Pin dimatikan", "Sensor diaktifkan", "Data dihantar ke serial"], answer: "Hentian selama 1 saat" },
+      { question: "Apakah maksud LED menyala berkelip pada Arduino?", options: ["Kod berjaya dimuat naik dan berjalan", "Arduino rosak", "Kabel putus", "Pin analog aktif"], answer: "Kod berjaya dimuat naik dan berjalan" }
     ];
 
     let current = 0, score = 0;
@@ -274,6 +237,13 @@
         resultDiv.innerHTML = `✅ Tamat! Skor anda: ${score}/${questions.length}`;
         progressBar.value = 100;
         saveScore(score);
+
+        optionsDiv.innerHTML = "";
+        const restartBtn = document.createElement("button");
+        restartBtn.className = "btn";
+        restartBtn.innerText = "🔁 Ulang Kuiz";
+        restartBtn.onclick = startQuiz;
+        optionsDiv.appendChild(restartBtn);
       }
     }
 
@@ -304,5 +274,7 @@
     showQuestion();
   }
 </script>
+
 </body>
 </html>
+
