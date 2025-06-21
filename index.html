@@ -125,16 +125,73 @@
       document.getElementById("authSection").style.display = "none";
       document.getElementById("mainContent").style.display = "block";
     }
+
     function register() {
       alert("Register function will be implemented with Firebase.");
     }
+
     function logout() {
       document.getElementById("mainContent").style.display = "none";
       document.getElementById("authSection").style.display = "block";
     }
+
     function startQuiz() {
-      alert("Quiz function will be implemented.");
+      const questions = [
+        { q: "Apakah itu Arduino?", options: ["Robot", "Sensor", "Mikropengawal", "Perisian"], a: "Mikropengawal" },
+        { q: "Arduino UNO menggunakan cip apa?", options: ["ATmega328P", "ESP32", "PIC16F877A", "ARM Cortex"], a: "ATmega328P" },
+        { q: "Apakah nama perisian rasmi untuk menulis kod Arduino?", options: ["Arduino Studio", "Arduino IDE", "CodeBlocks", "AVR Editor"], a: "Arduino IDE" },
+      ];
+      let current = 0, score = 0;
+      const qDiv = document.getElementById("question");
+      const optsDiv = document.getElementById("quiz-options");
+      const resultDiv = document.getElementById("quiz-result");
+      const bar = document.getElementById("quizProgress");
+      
+      function showQuestion() {
+        if (current >= questions.length) {
+          resultDiv.innerText = `Skor: ${score}/${questions.length}`;
+          optsDiv.innerHTML = '<button class="btn" onclick="startQuiz()">Ulang Kuiz</button>';
+          return;
+        }
+        const q = questions[current];
+        qDiv.innerText = q.q;
+        optsDiv.innerHTML = '';
+        resultDiv.innerText = '';
+        let countdown = 10;
+        resultDiv.innerText = `Masa: ${countdown}s`;
+        const timer = setInterval(() => {
+          countdown--;
+          resultDiv.innerText = `Masa: ${countdown}s`;
+          if (countdown === 0) {
+            clearInterval(timer);
+            current++;
+            showQuestion();
+          }
+        }, 1000);
+        q.options.forEach(opt => {
+          const btn = document.createElement("button");
+          btn.className = "btn";
+          btn.innerText = opt;
+          btn.onclick = () => {
+            clearInterval(timer);
+            if (opt === q.a) {
+              score++;
+              resultDiv.innerText = "✅ Betul!";
+            } else {
+              resultDiv.innerText = `❌ Salah. Jawapan: ${q.a}`;
+            }
+            setTimeout(() => {
+              current++;
+              showQuestion();
+            }, 1000);
+          };
+          optsDiv.appendChild(btn);
+        });
+        bar.value = (current / questions.length) * 100;
+      }
+      showQuestion();
     }
+
     function toggleDarkMode() {
       document.body.classList.toggle("dark-mode");
     }
