@@ -131,5 +131,44 @@
   </div>
 </div>
 
+<script>
+  function login() {
+    const email = document.getElementById("loginEmail").value;
+    const password = document.getElementById("loginPassword").value;
+
+    if (!email || !password) {
+      document.getElementById("authMessage").innerText = "❌ Sila isi semua ruangan.";
+      return;
+    }
+
+    // Simulasi login untuk debugging
+    document.getElementById("authSection").style.display = "none";
+    document.getElementById("mainContent").style.display = "block";
+    document.getElementById("welcomeUser").innerText = `Selamat Datang, ${email}`;
+  }
+
+  function register() {
+    const name = document.getElementById("registerName").value;
+    const email = document.getElementById("registerEmail").value;
+    const password = document.getElementById("registerPassword").value;
+
+    if (!name || !email || !password) {
+      document.getElementById("authMessage").innerText = "❌ Sila isi semua ruangan untuk mendaftar.";
+      return;
+    }
+
+    document.getElementById("authMessage").innerText = `✅ Pendaftaran berjaya untuk ${name}`;
+  }
+
+  function logout() {
+    document.getElementById("mainContent").style.display = "none";
+    document.getElementById("authSection").style.display = "block";
+  }
+
+  function toggleDarkMode() {
+    document.body.classList.toggle("dark-mode");
+  }
+</script>
+
 </body>
 </html>
