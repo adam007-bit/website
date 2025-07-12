@@ -76,13 +76,26 @@
       top: 20px;
       right: 20px;
     }
-    img {
-      margin-top: 10px;
-      width: 100%;
-      border-radius: 10px;
-    }
   </style>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
+
   <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyD02BBBqbetJ2MV6tl2WBysXyIWXKGB7xI",
+      authDomain: "arduino-registrations.firebaseapp.com",
+      projectId: "arduino-registrations",
+      storageBucket: "arduino-registrations.appspot.com",
+      messagingSenderId: "628252066469",
+      appId: "1:628252066469:web:8c1a0dd33d71c9fa6c834c"
+    };
+
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
     let currentLang = 'ms';
     const translations = {
       ms: {
@@ -132,7 +145,19 @@
     }
 
     function register() {
-      alert("Register function will be implemented with Firebase.");
+      const name = document.getElementById("registerName").value;
+      const email = document.getElementById("registerEmail").value;
+      const password = document.getElementById("registerPassword").value;
+
+      auth.createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+          alert("Pendaftaran berjaya! Selamat datang, " + name);
+          document.getElementById("authSection").style.display = "none";
+          document.getElementById("mainContent").style.display = "block";
+        })
+        .catch((error) => {
+          alert("Ralat: " + error.message);
+        });
     }
 
     function logout() {
@@ -259,23 +284,22 @@
     <ul style="text-align: left;">
       <li>
         🚗 Kereta Kawalan Arduino
-        <br><img src="images/arduinocar.jpg" alt="Arduino Car">
+        <br><img src="images/arduinocar.jpg" alt="Arduino">
       </li>
       <li>
         🛠️ Bengkel Arduino
-        <br><img src="images/bengkel.jpg" alt="Arduino Workshop">
+        <br><img src="images/bengkel.jpg" alt="Arduino">
       </li>
       <li>
         🏫 Projek Arduino Sekolah
-        <br><img src="images/sekolah.jpg" alt="Arduino School Project">
+        <br><img src="images/sekolah.jpg" alt="Arduino">
       </li>
       <li>
         💻 Latihan Kejuruteraan Perisian
-        <br><img src="images/software.jpg" alt="Software Training">
+        <br><img src="images/software.jpg" alt="Arduino">
       </li>
     </ul>
   </div>
 </div>
 </body>
 </html>
-
