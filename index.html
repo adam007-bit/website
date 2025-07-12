@@ -14,40 +14,53 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      transition: background-color 0.5s, color 0.5s;
     }
     .card {
       background-color: white;
-      border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
       padding: 30px;
       margin: 20px 0;
       width: 100%;
-      max-width: 600px;
+      max-width: 650px;
       text-align: center;
+      transition: transform 0.3s;
+    }
+    .card:hover {
+      transform: scale(1.02);
     }
     input {
       padding: 10px;
       margin: 8px 0;
       width: 100%;
       border: 1px solid #ccc;
-      border-radius: 6px;
+      border-radius: 8px;
+      transition: border-color 0.3s;
+    }
+    input:focus {
+      border-color: #007bff;
+      outline: none;
     }
     .btn {
       background-color: #007bff;
       border: none;
       color: white;
-      padding: 10px 18px;
+      padding: 12px 20px;
       margin: 10px 5px;
-      border-radius: 6px;
+      border-radius: 8px;
       cursor: pointer;
       font-weight: 600;
+      box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+      transition: transform 0.2s, box-shadow 0.2s;
     }
     .btn:hover {
       background-color: #0056b3;
+      transform: scale(1.05);
+      box-shadow: 0 8px 20px rgba(0, 86, 179, 0.5);
     }
-    .form-group {
-      margin-bottom: 15px;
-      text-align: left;
+    .btn:active {
+      transform: scale(0.95);
     }
     .dark-mode {
       background-color: #1e1e1e;
@@ -59,22 +72,33 @@
     }
     progress {
       width: 100%;
-      height: 20px;
+      height: 25px;
       margin-top: 10px;
+      border-radius: 10px;
+      overflow: hidden;
     }
-    a {
-      text-decoration: none;
-      color: #007bff;
-      font-weight: 500;
+    progress::-webkit-progress-bar {
+      background-color: #eee;
+      border-radius: 10px;
     }
-    a:hover {
-      color: #0056b3;
-      text-decoration: underline;
+    progress::-webkit-progress-value {
+      background: linear-gradient(90deg, #00c6ff, #0072ff);
+      border-radius: 10px;
     }
     .language-switcher {
       position: absolute;
       top: 20px;
       right: 20px;
+    }
+    img {
+      border-radius: 10px;
+      margin-top: 10px;
+      width: 100%;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    img:hover {
+      transform: scale(1.03);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
     }
   </style>
   <script>
@@ -202,28 +226,23 @@
 </head>
 <body>
 
-<!-- Language Switcher -->
 <div class="language-switcher">
   <button class="btn" onclick="switchLanguage()">🌐 Tukar Bahasa</button>
 </div>
 
-<!-- Login/Register Section -->
 <div id="authSection" class="card">
-  <h2>🔐 <span id="loginTitle">Log Masuk</span></h2>
+  <h2>🔐 Log Masuk</h2>
   <div class="form-group"><input type="email" id="loginEmail" placeholder="Email" /></div>
   <div class="form-group"><input type="password" id="loginPassword" placeholder="Kata Laluan" /></div>
   <button id="loginButton" class="btn" onclick="login()">Log Masuk</button>
 
-  <h3>📌 <span id="registerTitle">Daftar Akaun Baharu</span></h3>
+  <h3>📌 Daftar Akaun Baharu</h3>
   <div class="form-group"><input type="text" id="registerName" placeholder="Nama Penuh" /></div>
   <div class="form-group"><input type="email" id="registerEmail" placeholder="Email" /></div>
   <div class="form-group"><input type="password" id="registerPassword" placeholder="Kata Laluan" /></div>
   <button id="registerButton" class="btn" onclick="register()">Daftar</button>
-
-  <p id="authMessage"></p>
 </div>
 
-<!-- Main Content -->
 <div id="mainContent" style="display:none;">
   <div class="card">
     <h1 id="welcomeUser">Selamat Datang</h1>
@@ -255,25 +274,14 @@
 
     <h3 id="trainingTitle">Perkhidmatan Latihan</h3>
     <ul style="text-align: left;">
-      <li>
-        🚗 Kereta Kawalan Arduino
-        <br><img src="images/arduinocar.jpg" alt="Arduino" width="100%">
-      </li>
-      <li>
-        🛠️ Bengkel Arduino
-        <br><img src="images/bengkel.jpg" alt="Arduino" width="100%">
-      </li>
-      <li>
-        🏫 Projek Arduino Sekolah
-        <br><img src="images/sekolah.jpg" alt="Arduino" width="100%">
-      </li>
-      <li>
-        💻 Latihan Kejuruteraan Perisian
-        <br><img src="images/software.jpg" alt="Arduino" width="100%">
-      </li>
+      <li>🚗 Kereta Kawalan Arduino <br><img src="images/arduinocar.jpg" alt="Arduino"></li>
+      <li>🛠️ Bengkel Arduino <br><img src="images/bengkel.jpg" alt="Arduino"></li>
+      <li>🏫 Projek Arduino Sekolah <br><img src="images/sekolah.jpg" alt="Arduino"></li>
+      <li>💻 Latihan Kejuruteraan Perisian <br><img src="images/software.jpg" alt="Arduino"></li>
     </ul>
   </div>
 </div>
 </body>
 </html>
+
 
