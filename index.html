@@ -14,33 +14,16 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      overflow-x: hidden;
     }
     .card {
       background-color: white;
       border-radius: 16px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       padding: 30px;
       margin: 20px 0;
       width: 100%;
       max-width: 600px;
       text-align: center;
-      opacity: 0;
-      transform: translateY(20px);
-      animation: fadeIn 1s forwards;
-    }
-    input {
-      padding: 10px;
-      margin: 8px 0;
-      width: 100%;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      transition: all 0.3s ease;
-    }
-    input:focus {
-      border-color: #007bff;
-      box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-      outline: none;
     }
     .btn {
       background-color: #007bff;
@@ -51,148 +34,187 @@
       border-radius: 6px;
       cursor: pointer;
       font-weight: 600;
-      transition: transform 0.2s, box-shadow 0.2s;
+      transition: transform 0.2s;
     }
     .btn:hover {
       background-color: #0056b3;
       transform: scale(1.05);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-    }
-    .form-group {
-      margin-bottom: 15px;
-      text-align: left;
-    }
-    .dark-mode {
-      background-color: #1e1e1e;
-      color: #f0f0f0;
-    }
-    .dark-mode .card {
-      background-color: #2c2c2c;
-      color: white;
     }
     progress {
       width: 100%;
       height: 20px;
       margin-top: 10px;
     }
-    a {
-      text-decoration: none;
-      color: #007bff;
-      font-weight: 500;
-    }
-    a:hover {
-      color: #0056b3;
-      text-decoration: underline;
-    }
-    .language-switcher {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-    }
-    img {
-      width: 100%;
-      max-width: 300px;
-      border-radius: 8px;
+    .badge {
+      padding: 8px 16px;
+      background: gold;
+      border-radius: 12px;
+      display: inline-block;
       margin-top: 10px;
-      transition: transform 0.3s, box-shadow 0.3s;
+      font-weight: bold;
+      animation: pop 0.5s ease;
     }
-    img:hover {
-      transform: scale(1.05);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    @keyframes pop {
+      0% { transform: scale(0.5); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
     }
-    @keyframes fadeIn {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    #confetti-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 9999;
     }
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-  <script>
-    function confettiEffect() {
-      confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { y: 0.6 }
-      });
-    }
-
-    function login() {
-      document.getElementById("authSection").style.display = "none";
-      document.getElementById("mainContent").style.display = "block";
-      confettiEffect();
-    }
-
-    function logout() {
-      document.getElementById("mainContent").style.display = "none";
-      document.getElementById("authSection").style.display = "block";
-    }
-
-    function toggleDarkMode() {
-      document.body.classList.toggle("dark-mode");
-    }
-  </script>
 </head>
 <body>
 
-<div class="language-switcher">
-  <button class="btn" onclick="toggleDarkMode()">🌗 Tukar Mod</button>
+<!-- Main Content -->
+<canvas id="confetti-canvas"></canvas>
+<div class="card">
+  <h1 id="welcomeUser">Selamat Datang</h1>
+  <p id="introText" style="font-weight: bold; font-family: 'Courier New', Courier, monospace;">
+    Portal Pembelajaran Arduino ini direka khas untuk membantu pelajar sekolah memahami asas mikropengawal dan elektronik secara interaktif melalui kuiz, modul dan aktiviti yang menarik.
+  </p>
 </div>
 
-<div id="authSection" class="card">
-  <h2>🔐 Log Masuk</h2>
-  <div class="form-group"><input type="email" placeholder="Email" /></div>
-  <div class="form-group"><input type="password" placeholder="Kata Laluan" /></div>
-  <button class="btn" onclick="login()">Log Masuk</button>
+<div class="card">
+  <h2 id="quizTitle">🎯 Kuiz Arduino</h2>
+  <button id="startQuizButton" class="btn" onclick="startQuiz()">Mula Kuiz</button>
+  <div id="question" style="margin-top: 15px;"></div>
+  <div id="quiz-options"></div>
+  <progress id="quizProgress" value="0" max="100"></progress>
+  <div id="quiz-result" style="margin-top: 10px; font-weight: bold;"></div>
+  <div id="badge"></div>
 </div>
 
-<div id="mainContent" style="display:none;">
-  <div class="card">
-    <h1>Selamat Datang</h1>
-    <p style="font-weight: bold; font-family: 'Courier New', Courier, monospace;">
-      Portal Pembelajaran Arduino ini direka khas untuk membantu pelajar sekolah memahami asas mikropengawal dan elektronik secara interaktif melalui kuiz, modul dan aktiviti yang menarik.
-    </p>
-    <button class="btn" onclick="logout()">Log Keluar</button>
-  </div>
+<script>
+  const questions = [
+    { q: "Apakah itu Arduino?", options: ["Robot", "Sensor", "Mikropengawal", "Perisian"], a: "Mikropengawal" },
+    { q: "Arduino UNO menggunakan cip apa?", options: ["ATmega328P", "ESP32", "PIC16F877A", "ARM Cortex"], a: "ATmega328P" },
+    { q: "Apakah nama perisian rasmi untuk menulis kod Arduino?", options: ["Arduino Studio", "Arduino IDE", "CodeBlocks", "AVR Editor"], a: "Arduino IDE" },
+    { q: "Apakah fungsi pin GND pada Arduino?", options: ["Sumber kuasa", "Ground", "Input analog", "Output digital"], a: "Ground" },
+    { q: "Apakah maksud PWM?", options: ["Power Width Module", "Pulse Width Modulation", "Push With Motor", "Pin Wire Mode"], a: "Pulse Width Modulation" },
+    { q: "Komponen apa yang mengesan cahaya?", options: ["LDR", "Buzzer", "Relay", "Motor"], a: "LDR" },
+    { q: "Apakah kelebihan Arduino?", options: ["Harga mahal", "Sukar digunakan", "Mudah diprogram & open source", "Tiada komuniti"], a: "Mudah diprogram & open source" },
+    { q: "Apakah pin yang digunakan untuk input analog?", options: ["A0-A5", "D0-D13", "GND", "VIN"], a: "A0-A5" },
+    { q: "Arduino boleh disambung dengan?", options: ["Motor sahaja", "Lampu sahaja", "Pelbagai sensor & aktuator", "Speaker sahaja"], a: "Pelbagai sensor & aktuator" },
+    { q: "Bahasa pengaturcaraan utama Arduino?", options: ["Python", "C/C++", "Java", "HTML"], a: "C/C++" }
+  ];
 
-  <div class="card">
-    <h2>🎯 Kuiz Arduino</h2>
-    <button class="btn" onclick="alert('Nanti kita sambung kuiz!')">Mula Kuiz</button>
-    <img src="images/arduino.jpg" alt="Arduino">
-  </div>
+  function startQuiz() {
+    let current = 0, score = 0;
+    const qDiv = document.getElementById("question");
+    const optsDiv = document.getElementById("quiz-options");
+    const resultDiv = document.getElementById("quiz-result");
+    const bar = document.getElementById("quizProgress");
+    const badgeDiv = document.getElementById("badge");
+    badgeDiv.innerHTML = "";
+    stopConfetti();
 
-  <div class="card">
-    <h2>🏆 Cabaran Inovasi</h2>
-    <h3>Tentang Kami</h3>
-    <p>
-      Kami bersemangat dalam bidang teknologi dan pendidikan, menawarkan pengalaman pembelajaran secara praktikal melalui projek Arduino dan latihan kejuruteraan perisian.
-    </p>
-    <p>
-      Misi kami adalah untuk merapatkan jurang antara inovasi dan pembelajaran, serta memperkasakan individu untuk membina penyelesaian yang kreatif dan praktikal.
-    </p>
+    function showQuestion() {
+      if (current >= questions.length) {
+        resultDiv.innerText = `Skor: ${score}/${questions.length}`;
+        showBadge(score, questions.length);
+        startConfetti();
+        optsDiv.innerHTML = '<button class="btn" onclick="startQuiz()">Ulang Kuiz</button>';
+        return;
+      }
 
-    <h3>Perkhidmatan Latihan</h3>
-    <ul style="text-align: left;">
-      <li>
-        🚗 Kereta Kawalan Arduino
-        <br><img src="images/arduinocar.jpg" alt="Arduino Car">
-      </li>
-      <li>
-        🛠️ Bengkel Arduino
-        <br><img src="images/bengkel.jpg" alt="Arduino Workshop">
-      </li>
-      <li>
-        🏫 Projek Arduino Sekolah
-        <br><img src="images/sekolah.jpg" alt="Arduino School">
-      </li>
-      <li>
-        💻 Latihan Kejuruteraan Perisian
-        <br><img src="images/software.jpg" alt="Software Training">
-      </li>
-    </ul>
-  </div>
-</div>
+      const q = questions[current];
+      qDiv.innerText = `Soalan ${current+1}: ${q.q}`;
+      optsDiv.innerHTML = '';
+      resultDiv.innerText = '';
 
+      q.options.forEach(opt => {
+        const btn = document.createElement("button");
+        btn.className = "btn";
+        btn.innerText = opt;
+        btn.onclick = () => {
+          if (opt === q.a) {
+            score++;
+            resultDiv.innerText = "✅ Betul!";
+          } else {
+            resultDiv.innerText = `❌ Salah. Jawapan: ${q.a}`;
+          }
+          setTimeout(() => {
+            current++;
+            bar.value = (current / questions.length) * 100;
+            showQuestion();
+          }, 1000);
+        };
+        optsDiv.appendChild(btn);
+      });
+
+      bar.value = (current / questions.length) * 100;
+    }
+    showQuestion();
+  }
+
+  function showBadge(score, total) {
+    const badgeDiv = document.getElementById("badge");
+    let badge = "";
+    if (score === total) {
+      badge = "🏅 Lencana Emas! Hebat!";
+    } else if (score >= total * 0.7) {
+      badge = "🥈 Lencana Perak! Bagus!";
+    } else if (score >= total * 0.4) {
+      badge = "🥉 Lencana Gangsa! Cuba lagi!";
+    } else {
+      badge = "💪 Teruskan latihan!";
+    }
+    badgeDiv.innerHTML = `<div class="badge">${badge}</div>`;
+  }
+
+  // Confetti effect (simple canvas confetti)
+  let confettiInterval;
+  function startConfetti() {
+    const canvas = document.getElementById("confetti-canvas");
+    const ctx = canvas.getContext("2d");
+    let pieces = [];
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener("resize", resize);
+    resize();
+
+    function randomPiece() {
+      return {
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height - canvas.height,
+        w: 10,
+        h: 10,
+        color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+        dy: Math.random() * 3 + 2
+      };
+    }
+
+    pieces = Array.from({ length: 100 }, randomPiece);
+
+    function update() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (const p of pieces) {
+        p.y += p.dy;
+        if (p.y > canvas.height) {
+          p.y = -10;
+          p.x = Math.random() * canvas.width;
+        }
+        ctx.fillStyle = p.color;
+        ctx.fillRect(p.x, p.y, p.w, p.h);
+      }
+    }
+
+    confettiInterval = setInterval(update, 30);
+  }
+
+  function stopConfetti() {
+    clearInterval(confettiInterval);
+    const canvas = document.getElementById("confetti-canvas");
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+</script>
 </body>
 </html>
-
