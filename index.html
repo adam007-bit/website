@@ -78,9 +78,9 @@
     }
   </style>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
+  <!-- Firebase CDN -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"></script>
 
   <script>
     const firebaseConfig = {
@@ -92,214 +92,68 @@
       appId: "1:628252066469:web:8c1a0dd33d71c9fa6c834c"
     };
 
-    // Initialize Firebase
-    const app = firebase.initializeApp(firebaseConfig);
+    firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
-    let currentLang = 'ms';
-    const translations = {
-      ms: {
-        login: "Log Masuk",
-        register: "Daftar",
-        welcome: "Selamat Datang",
-        intro: "Portal Pembelajaran Arduino ini direka khas untuk membantu pelajar sekolah memahami asas mikropengawal dan elektronik secara interaktif melalui kuiz, modul dan aktiviti yang menarik.",
-        logout: "Log Keluar",
-        startQuiz: "Mula Kuiz",
-        quizTitle: "Kuiz Arduino",
-        innovation: "Cabaran Inovasi",
-        aboutUs: "Tentang Kami",
-        training: "Perkhidmatan Latihan"
-      },
-      en: {
-        login: "Login",
-        register: "Register",
-        welcome: "Welcome",
-        intro: "This Arduino Learning Portal is specially designed to help school students understand the basics of microcontrollers and electronics interactively through quizzes, modules, and engaging activities.",
-        logout: "Logout",
-        startQuiz: "Start Quiz",
-        quizTitle: "Arduino Quiz",
-        innovation: "Innovation Challenge",
-        aboutUs: "About Us",
-        training: "Training Services"
-      }
-    };
-
-    function switchLanguage() {
-      currentLang = currentLang === 'ms' ? 'en' : 'ms';
-      const t = translations[currentLang];
-      document.getElementById("loginButton").innerText = t.login;
-      document.getElementById("registerButton").innerText = t.register;
-      document.getElementById("welcomeUser").innerText = t.welcome;
-      document.getElementById("introText").innerText = t.intro;
-      document.getElementById("logoutButton").innerText = t.logout;
-      document.getElementById("startQuizButton").innerText = t.startQuiz;
-      document.getElementById("quizTitle").innerText = t.quizTitle;
-      document.getElementById("innovationTitle").innerText = t.innovation;
-      document.getElementById("aboutTitle").innerText = t.aboutUs;
-      document.getElementById("trainingTitle").innerText = t.training;
+    function register() {
+      const email = document.getElementById("registerEmail").value;
+      const password = document.getElementById("registerPassword").value;
+      auth.createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+          alert("Berjaya daftar: " + userCredential.user.email);
+        })
+        .catch((error) => {
+          alert("Error: " + error.message);
+        });
     }
 
     function login() {
-      document.getElementById("authSection").style.display = "none";
-      document.getElementById("mainContent").style.display = "block";
-    }
-
-    function register() {
-      const name = document.getElementById("registerName").value;
-      const email = document.getElementById("registerEmail").value;
-      const password = document.getElementById("registerPassword").value;
-
-      auth.createUserWithEmailAndPassword(email, password)
+      const email = document.getElementById("loginEmail").value;
+      const password = document.getElementById("loginPassword").value;
+      auth.signInWithEmailAndPassword(email, password)
         .then((userCredential) => {
-          alert("Pendaftaran berjaya! Selamat datang, " + name);
           document.getElementById("authSection").style.display = "none";
           document.getElementById("mainContent").style.display = "block";
         })
         .catch((error) => {
-          alert("Ralat: " + error.message);
+          alert("Error: " + error.message);
         });
     }
 
     function logout() {
-      document.getElementById("mainContent").style.display = "none";
-      document.getElementById("authSection").style.display = "block";
-    }
-
-    function startQuiz() {
-      const questions = [
-        { q: "Apakah itu Arduino?", options: ["Robot", "Sensor", "Mikropengawal", "Perisian"], a: "Mikropengawal" },
-        { q: "Arduino UNO menggunakan cip apa?", options: ["ATmega328P", "ESP32", "PIC16F877A", "ARM Cortex"], a: "ATmega328P" },
-        { q: "Apakah nama perisian rasmi untuk menulis kod Arduino?", options: ["Arduino Studio", "Arduino IDE", "CodeBlocks", "AVR Editor"], a: "Arduino IDE" },
-      ];
-      let current = 0, score = 0;
-      const qDiv = document.getElementById("question");
-      const optsDiv = document.getElementById("quiz-options");
-      const resultDiv = document.getElementById("quiz-result");
-      const bar = document.getElementById("quizProgress");
-      
-      function showQuestion() {
-        if (current >= questions.length) {
-          resultDiv.innerText = `Skor: ${score}/${questions.length}`;
-          optsDiv.innerHTML = '<button class="btn" onclick="startQuiz()">Ulang Kuiz</button>';
-          return;
-        }
-        const q = questions[current];
-        qDiv.innerText = q.q;
-        optsDiv.innerHTML = '';
-        resultDiv.innerText = '';
-        let countdown = 10;
-        resultDiv.innerText = `Masa: ${countdown}s`;
-        const timer = setInterval(() => {
-          countdown--;
-          resultDiv.innerText = `Masa: ${countdown}s`;
-          if (countdown === 0) {
-            clearInterval(timer);
-            current++;
-            showQuestion();
-          }
-        }, 1000);
-        q.options.forEach(opt => {
-          const btn = document.createElement("button");
-          btn.className = "btn";
-          btn.innerText = opt;
-          btn.onclick = () => {
-            clearInterval(timer);
-            if (opt === q.a) {
-              score++;
-              resultDiv.innerText = "✅ Betul!";
-            } else {
-              resultDiv.innerText = `❌ Salah. Jawapan: ${q.a}`;
-            }
-            setTimeout(() => {
-              current++;
-              showQuestion();
-            }, 1000);
-          };
-          optsDiv.appendChild(btn);
-        });
-        bar.value = (current / questions.length) * 100;
-      }
-      showQuestion();
-    }
-
-    function toggleDarkMode() {
-      document.body.classList.toggle("dark-mode");
+      auth.signOut().then(() => {
+        document.getElementById("mainContent").style.display = "none";
+        document.getElementById("authSection").style.display = "block";
+      });
     }
   </script>
 </head>
 <body>
 
-<!-- Language Switcher -->
-<div class="language-switcher">
-  <button class="btn" onclick="switchLanguage()">🌐 Tukar Bahasa</button>
-</div>
-
 <!-- Login/Register Section -->
 <div id="authSection" class="card">
-  <h2>🔐 <span id="loginTitle">Log Masuk</span></h2>
+  <h2>🔐 Log Masuk</h2>
   <div class="form-group"><input type="email" id="loginEmail" placeholder="Email" /></div>
   <div class="form-group"><input type="password" id="loginPassword" placeholder="Kata Laluan" /></div>
-  <button id="loginButton" class="btn" onclick="login()">Log Masuk</button>
+  <button class="btn" onclick="login()">Log Masuk</button>
 
-  <h3>📌 <span id="registerTitle">Daftar Akaun Baharu</span></h3>
+  <h3>📌 Daftar Akaun Baharu</h3>
   <div class="form-group"><input type="text" id="registerName" placeholder="Nama Penuh" /></div>
   <div class="form-group"><input type="email" id="registerEmail" placeholder="Email" /></div>
   <div class="form-group"><input type="password" id="registerPassword" placeholder="Kata Laluan" /></div>
-  <button id="registerButton" class="btn" onclick="register()">Daftar</button>
-
-  <p id="authMessage"></p>
+  <button class="btn" onclick="register()">Daftar</button>
 </div>
 
 <!-- Main Content -->
 <div id="mainContent" style="display:none;">
   <div class="card">
-    <h1 id="welcomeUser">Selamat Datang</h1>
-    <p id="introText" style="font-weight: bold; font-family: 'Courier New', Courier, monospace;">
+    <h1>Selamat Datang</h1>
+    <p style="font-weight: bold; font-family: 'Courier New', Courier, monospace;">
       Portal Pembelajaran Arduino ini direka khas untuk membantu pelajar sekolah memahami asas mikropengawal dan elektronik secara interaktif melalui kuiz, modul dan aktiviti yang menarik.
     </p>
-    <button class="btn" onclick="toggleDarkMode()">🌗 </button>
-    <button id="logoutButton" class="btn" onclick="logout()">Log Keluar</button>
-  </div>
-
-  <div class="card">
-    <h2 id="quizTitle">🎯 Kuiz Arduino</h2>
-    <button id="startQuizButton" class="btn" onclick="startQuiz()">Mula Kuiz</button>
-    <div id="question" style="margin-top: 15px;"></div>
-    <div id="quiz-options"></div>
-    <progress id="quizProgress" value="0" max="100"></progress>
-    <div id="quiz-result" style="margin-top: 10px; font-weight: bold;"></div>
-  </div>
-
-  <div class="card">
-    <h2 id="innovationTitle">🏆 Cabaran Inovasi</h2>
-    <h3 id="aboutTitle">Tentang Kami</h3>
-    <p>
-      Kami bersemangat dalam bidang teknologi dan pendidikan, menawarkan pengalaman pembelajaran secara praktikal melalui projek Arduino dan latihan kejuruteraan perisian.
-    </p>
-    <p>
-      Misi kami adalah untuk merapatkan jurang antara inovasi dan pembelajaran, serta memperkasakan individu untuk membina penyelesaian yang kreatif dan praktikal.
-    </p>
-
-    <h3 id="trainingTitle">Perkhidmatan Latihan</h3>
-    <ul style="text-align: left;">
-      <li>
-        🚗 Kereta Kawalan Arduino
-        <br><img src="images/arduinocar.jpg" alt="Arduino">
-      </li>
-      <li>
-        🛠️ Bengkel Arduino
-        <br><img src="images/bengkel.jpg" alt="Arduino">
-      </li>
-      <li>
-        🏫 Projek Arduino Sekolah
-        <br><img src="images/sekolah.jpg" alt="Arduino">
-      </li>
-      <li>
-        💻 Latihan Kejuruteraan Perisian
-        <br><img src="images/software.jpg" alt="Arduino">
-      </li>
-    </ul>
+    <button class="btn" onclick="logout()">Log Keluar</button>
   </div>
 </div>
+
 </body>
 </html>
