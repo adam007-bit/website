@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Portal Pembelajaran Arduino Rancak</title>
+  <title>Portal Pembelajaran Arduino Rancak Gila</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -19,36 +19,36 @@
     .card {
       background-color: white;
       border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
       padding: 30px;
       margin: 20px 0;
       width: 100%;
       max-width: 700px;
       text-align: center;
+      animation: slideUp 1s ease-out forwards;
       opacity: 0;
-      transform: translateY(20px);
-      animation: fadeIn 1s forwards;
+      transform: translateY(50px);
     }
-    @keyframes fadeIn {
+    @keyframes slideUp {
       to {
         opacity: 1;
         transform: translateY(0);
       }
     }
     .btn {
-      background-color: #007bff;
+      background: linear-gradient(45deg, #007bff, #00d4ff);
       border: none;
       color: white;
-      padding: 10px 18px;
+      padding: 12px 22px;
       margin: 10px 5px;
-      border-radius: 6px;
+      border-radius: 8px;
       cursor: pointer;
       font-weight: 600;
       transition: transform 0.2s, box-shadow 0.2s;
     }
     .btn:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 10px #007bff;
+      transform: scale(1.1);
+      box-shadow: 0 0 20px #00d4ff;
     }
     .typewriter {
       overflow: hidden;
@@ -87,6 +87,10 @@
       max-width: 300px;
       border-radius: 10px;
       margin-top: 10px;
+      transition: transform 0.3s;
+    }
+    img:hover {
+      transform: scale(1.05);
     }
   </style>
 </head>
@@ -94,7 +98,7 @@
 
 <div class="card">
   <h1 class="typewriter">Selamat Datang ke Portal Arduino Rancak!</h1>
-  <p style="font-weight: bold;">Belajar Arduino dengan cara paling seronok dan interaktif!</p>
+  <p style="font-weight: bold;">Belajar Arduino dengan cara paling seronok & interaktif!</p>
   <button class="btn" onclick="toggleTheme()">Tukar Tema 🌗</button>
   <button class="btn" onclick="startQuiz()">Mula Kuiz 🚀</button>
 </div>
@@ -141,6 +145,7 @@
 
 <audio id="sound-correct" src="https://www.myinstants.com/media/sounds/correct.mp3"></audio>
 <audio id="sound-wrong" src="https://www.myinstants.com/media/sounds/wrong-answer.mp3"></audio>
+<canvas id="confettiCanvas" style="position:fixed; top:0; left:0; pointer-events:none;"></canvas>
 
 <script>
 let theme = 'light';
@@ -168,6 +173,7 @@ function startQuiz() {
       resultDiv.innerText = `Skor: ${score}/${questions.length}`;
       if (score === questions.length) {
         badgeDiv.innerHTML = "🏅 Tahniah! Anda dapat Lencana Emas!";
+        startConfetti();
       } else if (score >= questions.length / 2) {
         badgeDiv.innerHTML = "🥈 Anda layak Lencana Perak!";
       } else {
@@ -215,6 +221,53 @@ function startQuiz() {
     });
   }
   showQuestion();
+}
+
+// Confetti
+function startConfetti() {
+  const canvas = document.getElementById('confettiCanvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  let pieces = Array.from({length: 100}, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height - canvas.height,
+    r: Math.random() * 6 + 4,
+    d: Math.random() * 30 + 10,
+    color: `hsl(${Math.random() * 360}, 70%, 50%)`,
+    tilt: Math.random() * 10 - 10,
+    tiltAngle: 0
+  }));
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (const p of pieces) {
+      ctx.beginPath();
+      ctx.lineWidth = p.r;
+      ctx.strokeStyle = p.color;
+      ctx.moveTo(p.x + p.tilt + p.r / 2, p.y);
+      ctx.lineTo(p.x + p.tilt, p.y + p.d);
+      ctx.stroke();
+    }
+    update();
+    requestAnimationFrame(draw);
+  }
+
+  function update() {
+    for (const p of pieces) {
+      p.tiltAngle += 0.1;
+      p.y += Math.cos(p.d) + 3;
+      p.tilt = Math.sin(p.tiltAngle) * 15;
+      if (p.y > canvas.height) {
+        p.x = Math.random() * canvas.width;
+        p.y = -20;
+        p.tilt = Math.random() * 10 - 10;
+      }
+    }
+  }
+
+  draw();
 }
 </script>
 </body>
