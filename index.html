@@ -95,12 +95,14 @@
 </div>
 
 <script>
-  const correctSound = new Audio('sounds/correct.mp3');
-  const wrongSound = new Audio('sounds/wrong.mp3');
-  const winSound = new Audio('sounds/win.mp3');
-
   function toggleDarkMode() {
     document.body.classList.toggle("dark-mode");
+  }
+
+  function speak(text) {
+    const msg = new SpeechSynthesisUtterance(text);
+    msg.lang = "ms-MY";
+    window.speechSynthesis.speak(msg);
   }
 
   function startQuiz() {
@@ -110,11 +112,6 @@
       { q: "Apakah nama perisian rasmi untuk menulis kod Arduino?", options: ["Arduino Studio", "Arduino IDE", "CodeBlocks", "AVR Editor"], a: "Arduino IDE" },
       { q: "Bahasa pengaturcaraan utama untuk Arduino?", options: ["Python", "C/C++", "Java", "Ruby"], a: "C/C++" },
       { q: "Komponen untuk membaca jarak?", options: ["Ultrasonik", "LED", "Relay", "Speaker"], a: "Ultrasonik" },
-      { q: "Apakah sensor untuk kesan suhu?", options: ["LDR", "Thermistor", "Potensiometer", "IR"], a: "Thermistor" },
-      { q: "Apakah kegunaan breadboard?", options: ["Sambung litar", "Simpan data", "Paparkan LED", "Hantar SMS"], a: "Sambung litar" },
-      { q: "Komponen untuk menghasilkan bunyi?", options: ["Speaker", "Relay", "Motor", "Resistor"], a: "Speaker" },
-      { q: "Apakah itu PWM?", options: ["Pulse Width Modulation", "Power Wiring Method", "Portable Wire Meter", "Programming With Modules"], a: "Pulse Width Modulation" },
-      { q: "Kabel USB digunakan untuk?", options: ["Program & bekalan kuasa", "Paparan LED", "Simpan fail", "Mengukur suhu"], a: "Program & bekalan kuasa" },
     ];
 
     let current = 0, score = 0;
@@ -125,8 +122,9 @@
 
     function showQuestion() {
       if (current >= questions.length) {
+        const finalMsg = `Tahniah! Skor anda ${score} daripada ${questions.length}`;
         resultDiv.innerText = `Skor: ${score}/${questions.length}`;
-        winSound.play();
+        speak(finalMsg);
         optsDiv.innerHTML = '<button class="btn" onclick="startQuiz()">Ulang Kuiz</button>';
         return;
       }
@@ -155,15 +153,15 @@
           if (opt === q.a) {
             score++;
             resultDiv.innerText = "✅ Betul!";
-            correctSound.play();
+            speak("Betul!");
           } else {
             resultDiv.innerText = `❌ Salah. Jawapan: ${q.a}`;
-            wrongSound.play();
+            speak(`Salah. Jawapan yang betul ialah ${q.a}`);
           }
           setTimeout(() => {
             current++;
             showQuestion();
-          }, 1500);
+          }, 2000);
         };
         optsDiv.appendChild(btn);
       });
@@ -175,4 +173,5 @@
 
 </body>
 </html>
+
 
