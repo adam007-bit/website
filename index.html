@@ -5,84 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Portal Pembelajaran Arduino</title>
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      padding: 30px;
-      background-color: #f4f6f9;
-      color: #333;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .card {
-      background-color: white;
-      border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      padding: 30px;
-      margin: 20px 0;
-      width: 100%;
-      max-width: 600px;
-      text-align: center;
-    }
-    input {
-      padding: 10px;
-      margin: 8px 0;
-      width: 100%;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-    }
-    .btn {
-      background-color: #007bff;
-      border: none;
-      color: white;
-      padding: 10px 18px;
-      margin: 10px 5px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 600;
-    }
-    .btn:hover {
-      background-color: #0056b3;
-    }
-    .form-group {
-      margin-bottom: 15px;
-      text-align: left;
-    }
-    .dark-mode {
-      background-color: #1e1e1e;
-      color: #f0f0f0;
-    }
-    .dark-mode .card {
-      background-color: #2c2c2c;
-      color: white;
-    }
-    progress {
-      width: 100%;
-      height: 20px;
-      margin-top: 10px;
-    }
-    a {
-      text-decoration: none;
-      color: #007bff;
-      font-weight: 500;
-    }
-    a:hover {
-      color: #0056b3;
-      text-decoration: underline;
-    }
-    .language-switcher {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-    }
+    body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 30px; background-color: #f4f6f9; color: #333; display: flex; flex-direction: column; align-items: center; }
+    .card { background-color: white; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); padding: 30px; margin: 20px 0; width: 100%; max-width: 600px; text-align: center; }
+    input { padding: 10px; margin: 8px 0; width: 100%; border: 1px solid #ccc; border-radius: 6px; }
+    .btn { background-color: #007bff; border: none; color: white; padding: 10px 18px; margin: 10px 5px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+    .btn:hover { background-color: #0056b3; }
+    .form-group { margin-bottom: 15px; text-align: left; }
   </style>
 
-  <!-- Firebase CDN -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"></script>
+  <!-- Firebase compat CDN -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 
   <script>
+    // Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyD02BBBqbetJ2MV6tl2WBysXyIWXKGB7xI",
       authDomain: "arduino-registrations.firebaseapp.com",
@@ -92,6 +28,7 @@
       appId: "1:628252066469:web:8c1a0dd33d71c9fa6c834c"
     };
 
+    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
@@ -111,7 +48,7 @@
       const email = document.getElementById("loginEmail").value;
       const password = document.getElementById("loginPassword").value;
       auth.signInWithEmailAndPassword(email, password)
-        .then((userCredential) => {
+        .then(() => {
           document.getElementById("authSection").style.display = "none";
           document.getElementById("mainContent").style.display = "block";
         })
@@ -138,7 +75,6 @@
   <button class="btn" onclick="login()">Log Masuk</button>
 
   <h3>📌 Daftar Akaun Baharu</h3>
-  <div class="form-group"><input type="text" id="registerName" placeholder="Nama Penuh" /></div>
   <div class="form-group"><input type="email" id="registerEmail" placeholder="Email" /></div>
   <div class="form-group"><input type="password" id="registerPassword" placeholder="Kata Laluan" /></div>
   <button class="btn" onclick="register()">Daftar</button>
@@ -148,9 +84,7 @@
 <div id="mainContent" style="display:none;">
   <div class="card">
     <h1>Selamat Datang</h1>
-    <p style="font-weight: bold; font-family: 'Courier New', Courier, monospace;">
-      Portal Pembelajaran Arduino ini direka khas untuk membantu pelajar sekolah memahami asas mikropengawal dan elektronik secara interaktif melalui kuiz, modul dan aktiviti yang menarik.
-    </p>
+    <p style="font-weight: bold;">Portal Pembelajaran Arduino ini direka khas untuk membantu pelajar sekolah memahami asas mikropengawal dan elektronik secara interaktif.</p>
     <button class="btn" onclick="logout()">Log Keluar</button>
   </div>
 </div>
