@@ -99,10 +99,23 @@
     document.body.classList.toggle("dark-mode");
   }
 
-  function speak(text) {
-    const msg = new SpeechSynthesisUtterance(text);
-    msg.lang = "ms-MY";
-    window.speechSynthesis.speak(msg);
+  function playBeep(frequency = 800, duration = 200) {
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+
+    oscillator.type = "square";
+    oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+    gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    oscillator.start();
+
+    setTimeout(() => {
+      oscillator.stop();
+      audioCtx.close();
+    }, duration);
   }
 
   function startQuiz() {
@@ -112,6 +125,11 @@
       { q: "Apakah nama perisian rasmi untuk menulis kod Arduino?", options: ["Arduino Studio", "Arduino IDE", "CodeBlocks", "AVR Editor"], a: "Arduino IDE" },
       { q: "Bahasa pengaturcaraan utama untuk Arduino?", options: ["Python", "C/C++", "Java", "Ruby"], a: "C/C++" },
       { q: "Komponen untuk membaca jarak?", options: ["Ultrasonik", "LED", "Relay", "Speaker"], a: "Ultrasonik" },
+      { q: "Apakah itu breadboard?", options: ["Roti bakar", "Papan litar ujian", "Arduino", "Skrin LED"], a: "Papan litar ujian" },
+      { q: "Apakah itu LED?", options: ["Sensor suhu", "Lampu diode", "Bateri", "Motor"], a: "Lampu diode" },
+      { q: "Apakah kegunaan resistor?", options: ["Meningkatkan voltan", "Menyejukkan arus", "Mengurangkan arus", "Menghasilkan cahaya"], a: "Mengurangkan arus" },
+      { q: "Kod `digitalWrite(13, HIGH)` bermaksud?", options: ["Baca pin", "Tutup pin", "Hidupkan pin", "Reset pin"], a: "Hidupkan pin" },
+      { q: "Apakah fungsi `delay(1000);` dalam kod Arduino?", options: ["Bunyi buzzer", "Tangguh 1 saat", "Matikan sistem", "Reset Arduino"], a: "Tangguh 1 saat" }
     ];
 
     let current = 0, score = 0;
@@ -122,25 +140,31 @@
 
     function showQuestion() {
       if (current >= questions.length) {
-        const finalMsg = `Tahniah! Skor anda ${score} daripada ${questions.length}`;
         resultDiv.innerText = `Skor: ${score}/${questions.length}`;
-        speak(finalMsg);
         optsDiv.innerHTML = '<button class="btn" onclick="startQuiz()">Ulang Kuiz</button>';
+        qDiv.innerText = "";
+        bar.value = 100;
         return;
       }
+
       const q = questions[current];
       qDiv.innerText = q.q;
       optsDiv.innerHTML = '';
       resultDiv.innerText = '';
       let countdown = 10;
       resultDiv.innerText = `Masa: ${countdown}s`;
+
       const timer = setInterval(() => {
         countdown--;
         resultDiv.innerText = `Masa: ${countdown}s`;
         if (countdown === 0) {
           clearInterval(timer);
-          current++;
-          showQuestion();
+          playBeep(300, 400); // bunyi tenet
+          resultDiv.innerText = `⏰ Masa Tamat. Jawapan: ${q.a}`;
+          setTimeout(() => {
+            current++;
+            showQuestion();
+          }, 2000);
         }
       }, 1000);
 
@@ -153,10 +177,10 @@
           if (opt === q.a) {
             score++;
             resultDiv.innerText = "✅ Betul!";
-            speak("Betul!");
+            playBeep(800, 300); // bunyi tuut
           } else {
             resultDiv.innerText = `❌ Salah. Jawapan: ${q.a}`;
-            speak(`Salah. Jawapan yang betul ialah ${q.a}`);
+            playBeep(300, 400); // bunyi tenet
           }
           setTimeout(() => {
             current++;
@@ -165,13 +189,16 @@
         };
         optsDiv.appendChild(btn);
       });
+
       bar.value = (current / questions.length) * 100;
     }
+
     showQuestion();
   }
 </script>
 
 </body>
 </html>
+
 
 
