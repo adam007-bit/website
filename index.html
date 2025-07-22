@@ -63,6 +63,19 @@
       background-color: #2c2c2c;
       color: white;
     }
+    .confetti {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+    }
+    #playerNameDisplay {
+      margin-top: 10px;
+      font-style: italic;
+    }
   </style>
 </head>
 <body>
@@ -77,12 +90,17 @@
 
 <div class="card">
   <h2>🎯 Kuiz Arduino</h2>
-  <button class="btn" onclick="startQuiz()">Mula Kuiz</button>
+  <div>
+    <input id="playerName" placeholder="Masukkan nama anda..." />
+    <button class="btn" onclick="startQuiz()">Mula Kuiz</button>
+    <div id="playerNameDisplay"></div>
+  </div>
   <div id="question" style="margin-top:15px;"></div>
   <div id="quiz-options"></div>
   <progress id="quizProgress" value="0" max="100"></progress>
   <div id="quiz-result" style="margin-top:10px; font-weight:bold;"></div>
   <div id="highscore" style="margin-top:10px; font-style:italic;"></div>
+  <div id="leaderboard" style="margin-top:15px; text-align:left;"></div>
 </div>
 
 <div class="card">
@@ -95,132 +113,156 @@
   </ul>
 </div>
 
+<canvas class="confetti" id="confetti"></canvas>
+
 <script>
-  function toggleDarkMode() {
-    document.body.classList.toggle("dark-mode");
+// Kekalkan semua fungsi sama, cuma tukar cara ambil nama dari input (bukan prompt)
+let playerName = "Tetamu";
+function toggleDarkMode() {
+  document.body.classList.toggle("dark-mode");
+}
+function beep(frequency = 600, duration = 200) {
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = "square";
+  osc.frequency.value = frequency;
+  gain.gain.value = 0.2;
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.start();
+  setTimeout(() => {
+    osc.stop();
+    ctx.close();
+  }, duration);
+}
+function applause() {
+  for (let i = 0; i < 3; i++) setTimeout(() => beep(1000 - i * 200, 150), i * 200);
+}
+function showConfetti() {
+  const canvas = document.getElementById("confetti");
+  const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  let particles = Array.from({ length: 150 }, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    r: Math.random() * 4 + 1,
+    d: Math.random() * 50,
+    color: `hsl(${Math.random() * 360}, 70%, 60%)`
+  }));
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = p.color;
+      ctx.fill();
+      p.y += Math.cos(p.d) + 1;
+      p.x += Math.sin(p.d);
+      if (p.y > canvas.height) p.y = 0;
+    });
+    requestAnimationFrame(draw);
   }
+  draw();
+  setTimeout(() => (canvas.width = 0), 3000);
+}
+function updateLeaderboard(name, score) {
+  const data = JSON.parse(localStorage.getItem("leaderboard") || "[]");
+  data.push({ name, score });
+  data.sort((a, b) => b.score - a.score);
+  localStorage.setItem("leaderboard", JSON.stringify(data.slice(0, 5)));
+}
+function renderLeaderboard() {
+  const lb = JSON.parse(localStorage.getItem("leaderboard") || "[]");
+  const html = lb.map((p, i) => `<div>#${i + 1} ${p.name} - ${p.score}</div>`).join("");
+  document.getElementById("leaderboard").innerHTML = `<h4>🏆 Leaderboard:</h4>${html}`;
+}
+function startQuiz() {
+  const nameInput = document.getElementById("playerName");
+  playerName = nameInput.value.trim() || "Tetamu";
+  document.getElementById("playerNameDisplay").innerText = `👤 Nama: ${playerName}`;
 
-  function beep(frequency = 600, duration = 200) {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = "square";
-    osc.frequency.value = frequency;
-    gain.gain.value = 0.2;
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.start();
-    setTimeout(() => {
-      osc.stop();
-      ctx.close();
-    }, duration);
-  }
+  const questions = [
+    { q: "Apakah itu Arduino?", options: ["Robot", "Sensor", "Mikropengawal", "Perisian"], a: "Mikropengawal" },
+    { q: "Arduino UNO menggunakan cip apa?", options: ["ATmega328P", "ESP32", "PIC16F877A", "ARM Cortex"], a: "ATmega328P" },
+    { q: "Apakah nama perisian rasmi untuk menulis kod Arduino?", options: ["Arduino Studio", "Arduino IDE", "CodeBlocks", "AVR Editor"], a: "Arduino IDE" },
+    { q: "Bahasa pengaturcaraan utama untuk Arduino?", options: ["Python", "C/C++", "Java", "Ruby"], a: "C/C++" },
+    { q: "Komponen untuk membaca jarak?", options: ["Ultrasonik", "LED", "Relay", "Speaker"], a: "Ultrasonik" }
+  ];
 
-  function applause() {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = "triangle";
-    osc.frequency.setValueAtTime(1200, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 1);
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.start();
-    osc.stop(ctx.currentTime + 1);
-  }
+  let current = 0, score = 0;
+  const qDiv = document.getElementById("question");
+  const optsDiv = document.getElementById("quiz-options");
+  const resultDiv = document.getElementById("quiz-result");
+  const bar = document.getElementById("quizProgress");
+  const highscoreDiv = document.getElementById("highscore");
 
-  function startQuiz() {
-    const questions = [
-      { q: "Apakah itu Arduino?", options: ["Robot", "Sensor", "Mikropengawal", "Perisian"], a: "Mikropengawal" },
-      { q: "Arduino UNO menggunakan cip apa?", options: ["ATmega328P", "ESP32", "PIC16F877A", "ARM Cortex"], a: "ATmega328P" },
-      { q: "Apakah nama perisian rasmi untuk menulis kod Arduino?", options: ["Arduino Studio", "Arduino IDE", "CodeBlocks", "AVR Editor"], a: "Arduino IDE" },
-      { q: "Bahasa pengaturcaraan utama untuk Arduino?", options: ["Python", "C/C++", "Java", "Ruby"], a: "C/C++" },
-      { q: "Komponen untuk membaca jarak?", options: ["Ultrasonik", "LED", "Relay", "Speaker"], a: "Ultrasonik" },
-      { q: "Apakah itu breadboard?", options: ["Roti bakar", "Papan litar ujian", "Arduino", "Skrin LED"], a: "Papan litar ujian" },
-      { q: "Apakah itu LED?", options: ["Sensor suhu", "Lampu diode", "Bateri", "Motor"], a: "Lampu diode" },
-      { q: "Apakah kegunaan resistor?", options: ["Meningkatkan voltan", "Menyejukkan arus", "Mengurangkan arus", "Menghasilkan cahaya"], a: "Mengurangkan arus" },
-      { q: "Kod `digitalWrite(13, HIGH)` bermaksud?", options: ["Baca pin", "Tutup pin", "Hidupkan pin", "Reset pin"], a: "Hidupkan pin" },
-      { q: "Apakah fungsi `delay(1000);` dalam kod Arduino?", options: ["Bunyi buzzer", "Tangguh 1 saat", "Matikan sistem", "Reset Arduino"], a: "Tangguh 1 saat" }
-    ];
-
-    let current = 0, score = 0;
-    const qDiv = document.getElementById("question");
-    const optsDiv = document.getElementById("quiz-options");
-    const resultDiv = document.getElementById("quiz-result");
-    const bar = document.getElementById("quizProgress");
-    const highscoreDiv = document.getElementById("highscore");
-    const highscore = parseInt(localStorage.getItem("highscore")) || 0;
-
-    highscoreDiv.innerText = `🎮 Skor Tertinggi: ${highscore}`;
-
-    function showQuestion() {
-      if (current >= questions.length) {
-        applause();
-        resultDiv.innerText = `Skor: ${score}/${questions.length}`;
-        if (score === questions.length) {
-          resultDiv.innerHTML += "<br>🏅 Tahniah! Anda mendapat Lencana <b>Level Pro</b>!";
-        }
-        if (score > highscore) {
-          localStorage.setItem("highscore", score);
-          highscoreDiv.innerText = `🎮 Skor Tertinggi: ${score}`;
-        }
-        optsDiv.innerHTML = '<button class="btn" onclick="startQuiz()">Ulang Kuiz</button>';
-        qDiv.innerText = "";
-        bar.value = 100;
-        return;
+  function showQuestion() {
+    if (current >= questions.length) {
+      applause();
+      updateLeaderboard(playerName, score);
+      renderLeaderboard();
+      resultDiv.innerText = `Skor: ${score}/${questions.length}`;
+      if (score === questions.length) {
+        resultDiv.innerHTML += "<br>🏅 Tahniah! Anda mendapat Lencana <b>Level Pro</b>!";
+        showConfetti();
       }
-
-      const q = questions[current];
-      qDiv.innerText = q.q;
-      optsDiv.innerHTML = '';
-      resultDiv.innerText = '';
-      let countdown = 10;
-      resultDiv.innerText = `Masa: ${countdown}s`;
-
-      const timer = setInterval(() => {
-        countdown--;
-        resultDiv.innerText = `Masa: ${countdown}s`;
-        if (countdown === 3) beep(1000, 300); // Amaran 3 saat terakhir
-        if (countdown === 0) {
-          clearInterval(timer);
-          beep(400, 300); // Masa tamat
-          resultDiv.innerText = `⏰ Masa Tamat. Jawapan: ${q.a}`;
-          setTimeout(() => {
-            current++;
-            showQuestion();
-          }, 2000);
-        }
-      }, 1000);
-
-      q.options.forEach(opt => {
-        const btn = document.createElement("button");
-        btn.className = "btn";
-        btn.innerText = opt;
-        btn.onclick = () => {
-          clearInterval(timer);
-          if (opt === q.a) {
-            score++;
-            resultDiv.innerText = "✅ Betul!";
-            beep(800, 300);
-          } else {
-            resultDiv.innerText = `❌ Salah. Jawapan: ${q.a}`;
-            beep(300, 300);
-          }
-          setTimeout(() => {
-            current++;
-            showQuestion();
-          }, 2000);
-        };
-        optsDiv.appendChild(btn);
-      });
-
-      bar.value = (current / questions.length) * 100;
+      optsDiv.innerHTML = '<button class="btn" onclick="startQuiz()">Ulang Kuiz</button>';
+      qDiv.innerText = "";
+      bar.value = 100;
+      return;
     }
 
-    showQuestion();
-  }
-</script>
+    const q = questions[current];
+    qDiv.innerText = q.q;
+    optsDiv.innerHTML = '';
+    resultDiv.innerText = '';
+    let countdown = 10;
+    resultDiv.innerText = `Masa: ${countdown}s`;
 
+    const timer = setInterval(() => {
+      countdown--;
+      resultDiv.innerText = `Masa: ${countdown}s`;
+      if (countdown === 3) beep(1000, 200);
+      if (countdown === 0) {
+        clearInterval(timer);
+        beep(400, 300);
+        resultDiv.innerText = `⏰ Masa Tamat. Jawapan: ${q.a}`;
+        setTimeout(() => {
+          current++;
+          showQuestion();
+        }, 2000);
+      }
+    }, 1000);
+
+    q.options.forEach(opt => {
+      const btn = document.createElement("button");
+      btn.className = "btn";
+      btn.innerText = opt;
+      btn.onclick = () => {
+        clearInterval(timer);
+        if (opt === q.a) {
+          score++;
+          resultDiv.innerText = "✅ Betul!";
+          beep(800, 300);
+        } else {
+          resultDiv.innerText = `❌ Salah. Jawapan: ${q.a}`;
+          beep(300, 300);
+        }
+        setTimeout(() => {
+          current++;
+          showQuestion();
+        }, 2000);
+      };
+      optsDiv.appendChild(btn);
+    });
+    bar.value = (current / questions.length) * 100;
+  }
+
+  showQuestion();
+}
+</script>
 </body>
 </html>
 
